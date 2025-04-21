@@ -1,0 +1,3 @@
+@echo off
+echo Starting Supabase MCP Server...
+npx -y @supabase/mcp-server-supabase@latest --access-token eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhxY2pmbXpidWtjaHZiYWd2aXd0Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0NDY5ODM4MCwiZXhwIjoyMDYwMjc0MzgwfQ.ixSsmtPYhha3zYwa-wRaOwsvHbTSjBh64sRSpXB_eyk

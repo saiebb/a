@@ -1,0 +1,29 @@
+import type React from "react"
+import { redirect } from "next/navigation"
+import { isAdmin } from "@/lib/admin-actions"
+import { AdminSidebar } from "@/components/admin/admin-sidebar"
+
+export const metadata = {
+  title: "Admin Dashboard | Jazati",
+  description: "Administrative dashboard for Jazati vacation management system",
+}
+
+export default async function AdminLayout({
+  children,
+}: {
+  children: React.ReactNode
+}) {
+  // Check if the current user is an admin
+  const userIsAdmin = await isAdmin()
+
+  if (!userIsAdmin) {
+    redirect("/")
+  }
+
+  return (
+    <div className="flex min-h-screen">
+      <AdminSidebar />
+      <div className="flex-1 overflow-auto">{children}</div>
+    </div>
+  )
+}

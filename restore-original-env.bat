@@ -1,0 +1,6 @@
+@echo off
+echo Backing up MCP environment variables...
+copy .env.local .env.local.mcp.backup
+echo Restoring original environment variables...
+copy .env.local.original .env.local
+echo Original environment variables restored.

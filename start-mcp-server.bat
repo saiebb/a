@@ -1,0 +1,3 @@
+@echo off
+echo Starting Supabase MCP Server...
+npx -y @supabase/mcp@latest start

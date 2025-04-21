@@ -1,0 +1,172 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+
+    --primary: 122 39% 49%; /* #4CAF50 - Green */
+    --primary-foreground: 210 40% 98%;
+
+    --secondary: 195 53% 79%; /* #ADD8E6 - Sky Blue */
+    --secondary-foreground: 222.2 47.4% 11.2%;
+
+    --accent: 14 100% 70%; /* #FF8A65 - Warm Orange */
+    --accent-foreground: 222.2 47.4% 11.2%;
+
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 122 39% 49%;
+
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 122 39% 49%;
+    --primary-foreground: 210 40% 98%;
+
+    --secondary: 195 53% 79%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+
+    --accent: 14 100% 70%;
+    --accent-foreground: 210 40% 98%;
+
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 122 39% 49%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-family: var(--font-ibm-plex-sans-arabic), system-ui, sans-serif;
+  }
+}
+
+/* RTL specific adjustments */
+[dir="rtl"] .rtl-mirror {
+  transform: scaleX(-1);
+}
+
+/* Bidirectional text support */
+.bidi-auto {
+  unicode-bidi: plaintext;
+}
+
+/* Fix for RTL input fields */
+[dir="rtl"] input[type="text"],
+[dir="rtl"] input[type="email"],
+[dir="rtl"] input[type="number"],
+[dir="rtl"] textarea {
+  text-align: right;
+}
+
+/* Fix for RTL dropdown menus */
+[dir="rtl"] .dropdown-content {
+  left: auto;
+  right: 0;
+}
+
+/* Fix for RTL icons in buttons */
+[dir="rtl"] .button-icon-start {
+  margin-right: 0;
+  margin-left: 0.5rem;
+}
+
+[dir="rtl"] .button-icon-end {
+  margin-left: 0;
+  margin-right: 0.5rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  .container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+}
+
+/* Mobile optimizations */
+@media (max-width: 768px) {
+  .mobile-full-width {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .mobile-stack {
+    flex-direction: column;
+  }
+
+  .mobile-hidden {
+    display: none;
+  }
+
+  .mobile-compact-padding {
+    padding: 0.75rem !important;
+  }
+
+  .mobile-text-sm {
+    font-size: 0.875rem !important;
+  }
+}
+
+/* Improved touch targets for mobile */
+@media (max-width: 768px) {
+  button,
+  .button,
+  a,
+  select,
+  input[type="checkbox"],
+  input[type="radio"] {
+    min-height: 2.5rem;
+    min-width: 2.5rem;
+  }
+
+  .touch-target {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
+
+/* Theme transition */
+.theme-transition {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+/* Language transition */
+html {
+  transition: direction 0.2s ease;
+}
