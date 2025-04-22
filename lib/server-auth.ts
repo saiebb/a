@@ -4,9 +4,9 @@ import { redirect } from "next/navigation"
 import type { Database } from "@/types/database"
 
 // Create a Supabase client for server components
-export const createServerClient = () => {
+export const createServerClient = async () => {
   try {
-    const cookieStore = cookies()
+    const cookieStore = await cookies()
     return createServerComponentClient<Database>({ cookies: () => cookieStore })
   } catch (error) {
     console.error("Failed to create server Supabase client:", error)
@@ -17,7 +17,7 @@ export const createServerClient = () => {
 // Get the current session on the server
 export async function getServerSession() {
   try {
-    const supabase = createServerClient()
+    const supabase = await createServerClient()
     return await supabase.auth.getSession()
   } catch (error) {
     console.error("Failed to get server session:", error)
@@ -38,7 +38,41 @@ export async function getServerUser() {
       return null
     }
 
-    return session?.user || null
+    if (!session?.user) {
+      return null
+    }
+
+    // Get user data from the database to include role information
+    // First try to find by ID
+    const supabase = await createServerClient()
+    let { data: userData, error: userError } = await supabase
+      .from("users")
+      .select("*")
+      .eq("id", session.user.id)
+      .single()
+
+    // If not found by ID, try to find by email
+    if (userError && session.user.email) {
+      console.log("User not found by ID, trying to find by email")
+      const { data: userByEmail, error: emailError } = await supabase
+        .from("users")
+        .select("*")
+        .eq("email", session.user.email)
+        .single()
+
+      if (!emailError) {
+        userData = userByEmail
+        userError = null
+      }
+    }
+
+    if (userError) {
+      console.error("Error fetching user data:", userError)
+      return session.user
+    }
+
+    // Merge the auth user with the database user data
+    return { ...session.user, ...userData }
   } catch (error) {
     console.error("Unexpected error getting server user:", error)
     return null
@@ -73,7 +107,7 @@ export async function getUserProfile(userId: string) {
       return null
     }
 
-    const supabase = createServerClient()
+    const supabase = await createServerClient()
 
     const { data, error } = await supabase.from("users").select("*").eq("id", userId).single()
 
@@ -97,7 +131,7 @@ export async function getUserPreferences(userId: string) {
       return null
     }
 
-    const supabase = createServerClient()
+    const supabase = await createServerClient()
 
     const { data, error } = await supabase.from("user_preferences").select("*").eq("user_id", userId).single()
 
@@ -118,7 +152,7 @@ export async function checkUserExists(userId: string) {
   try {
     if (!userId) return false
 
-    const supabase = createServerClient()
+    const supabase = await createServerClient()
 
     const { data, error } = await supabase.from("users").select("id").eq("id", userId).single()
 

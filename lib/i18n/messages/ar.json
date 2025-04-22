@@ -238,5 +238,77 @@
   "notifications": {
     "noNotifications": "لا توجد إشعارات حتى الآن",
     "loadingNotifications": "جاري تحميل الإشعارات..."
+  },
+  "manager": {
+    "dashboard": {
+      "title": "لوحة تحكم المدير",
+      "description": "إدارة فريقك وطلبات الإجازات",
+      "viewTeam": "عرض الفريق",
+      "viewCalendar": "عرض التقويم",
+      "teamMembers": "أعضاء الفريق",
+      "totalTeamMembers": "إجمالي أعضاء الفريق",
+      "pendingRequests": "الطلبات المعلقة",
+      "awaitingApproval": "في انتظار الموافقة",
+      "upcomingVacations": "الإجازات القادمة",
+      "nextSevenDays": "خلال الأيام السبعة القادمة",
+      "pendingApprovals": "الموافقات المعلقة",
+      "pendingApprovalsDescription": "طلبات الإجازة التي تحتاج إلى مراجعة",
+      "noPendingRequests": "لا توجد طلبات معلقة",
+      "noPendingRequestsDescription": "ليس لديك أي طلبات إجازة معلقة للمراجعة حالياً",
+      "teamSummary": "ملخص الفريق",
+      "teamSummaryDescription": "نظرة عامة على إجازات فريقك",
+      "quickActions": "إجراءات سريعة",
+      "quickActionsDescription": "مهام شائعة قد ترغب في القيام بها",
+      "viewTeamMembers": "عرض أعضاء الفريق",
+      "viewTeamMembersDescription": "إدارة أعضاء فريقك وعرض معلوماتهم",
+      "reviewRequests": "مراجعة الطلبات",
+      "reviewRequestsDescription": "مراجعة طلبات الإجازة المعلقة والموافقة عليها",
+      "teamCalendar": "تقويم الفريق",
+      "teamCalendarDescription": "عرض جميع إجازات الفريق في تقويم",
+      "onVacationToday": "في إجازة اليوم",
+      "vacationsByType": "الإجازات حسب النوع",
+      "noVacationData": "لا توجد بيانات إجازة متاحة"
+    },
+    "actions": {
+      "approve": "موافقة",
+      "reject": "رفض",
+      "approving": "جاري الموافقة...",
+      "rejecting": "جاري الرفض...",
+      "vacationApproved": "تمت الموافقة على الإجازة",
+      "vacationApprovedDescription": "تمت الموافقة على طلب الإجازة بنجاح",
+      "approvalFailed": "فشلت الموافقة",
+      "vacationRejected": "تم رفض الإجازة",
+      "vacationRejectedDescription": "تم رفض طلب الإجازة بنجاح",
+      "rejectionFailed": "فشل الرفض",
+      "unexpectedError": "حدث خطأ غير متوقع",
+      "rejectVacation": "رفض طلب الإجازة",
+      "rejectVacationDescription": "يرجى تقديم سبب لرفض طلب الإجازة هذا",
+      "rejectReasonPlaceholder": "أدخل سبب الرفض هنا...",
+      "confirmReject": "تأكيد الرفض"
+    },
+    "pending": {
+      "title": "الطلبات المعلقة",
+      "description": "مراجعة وإدارة طلبات الإجازة المعلقة",
+      "pendingRequests": "الطلبات المعلقة",
+      "pendingRequestsDescription": "طلبات الإجازة التي تحتاج إلى مراجعة"
+    },
+    "team": {
+      "title": "فريقي",
+      "description": "إدارة أعضاء فريقك وعرض معلوماتهم",
+      "teamMembers": "أعضاء الفريق",
+      "teamMembersDescription": "قائمة بجميع أعضاء فريقك",
+      "viewVacations": "عرض الإجازات",
+      "contact": "اتصال",
+      "noTeamMembers": "لا يوجد أعضاء في فريقك حالياً"
+    },
+    "teamMember": {
+      "vacations": "الإجازات",
+      "vacationsDescription": "عرض سجل إجازات عضو الفريق",
+      "viewCalendar": "عرض في التقويم",
+      "vacationHistory": "سجل الإجازات",
+      "vacationHistoryDescription": "جميع طلبات الإجازة السابقة والحالية",
+      "adminNote": "ملاحظة المدير",
+      "noVacations": "لم يقم هذا العضو بطلب أي إجازات بعد"
+    }
   }
 }

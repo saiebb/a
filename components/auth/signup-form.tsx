@@ -9,7 +9,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { Eye, EyeOff, Loader2 } from "lucide-react"
 import { signUpWithEmail, signInWithProvider } from "@/lib/auth"
 import { useToast } from "@/hooks/use-toast"
-import { useLanguage } from "@/lib/i18n/client.tsx"
+import { useLanguage } from "@/lib/i18n/client"
 import { useTranslations } from "@/hooks/use-translations"
 
 import { Button } from "@/components/ui/button"

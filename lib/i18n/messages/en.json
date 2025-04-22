@@ -238,5 +238,77 @@
   "notifications": {
     "noNotifications": "No notifications yet",
     "loadingNotifications": "Loading notifications..."
+  },
+  "manager": {
+    "dashboard": {
+      "title": "Manager Dashboard",
+      "description": "Manage your team and vacation requests",
+      "viewTeam": "View Team",
+      "viewCalendar": "View Calendar",
+      "teamMembers": "Team Members",
+      "totalTeamMembers": "Total team members",
+      "pendingRequests": "Pending Requests",
+      "awaitingApproval": "Awaiting approval",
+      "upcomingVacations": "Upcoming Vacations",
+      "nextSevenDays": "In the next 7 days",
+      "pendingApprovals": "Pending Approvals",
+      "pendingApprovalsDescription": "Vacation requests that need review",
+      "noPendingRequests": "No Pending Requests",
+      "noPendingRequestsDescription": "You don't have any pending vacation requests to review at the moment",
+      "teamSummary": "Team Summary",
+      "teamSummaryDescription": "Overview of your team's vacations",
+      "quickActions": "Quick Actions",
+      "quickActionsDescription": "Common tasks you might want to do",
+      "viewTeamMembers": "View Team Members",
+      "viewTeamMembersDescription": "Manage your team members and view their information",
+      "reviewRequests": "Review Requests",
+      "reviewRequestsDescription": "Review pending vacation requests and approve them",
+      "teamCalendar": "Team Calendar",
+      "teamCalendarDescription": "View all team vacations in a calendar",
+      "onVacationToday": "On Vacation Today",
+      "vacationsByType": "Vacations by Type",
+      "noVacationData": "No vacation data available"
+    },
+    "actions": {
+      "approve": "Approve",
+      "reject": "Reject",
+      "approving": "Approving...",
+      "rejecting": "Rejecting...",
+      "vacationApproved": "Vacation Approved",
+      "vacationApprovedDescription": "The vacation request has been approved successfully",
+      "approvalFailed": "Approval Failed",
+      "vacationRejected": "Vacation Rejected",
+      "vacationRejectedDescription": "The vacation request has been rejected successfully",
+      "rejectionFailed": "Rejection Failed",
+      "unexpectedError": "An unexpected error occurred",
+      "rejectVacation": "Reject Vacation Request",
+      "rejectVacationDescription": "Please provide a reason for rejecting this vacation request",
+      "rejectReasonPlaceholder": "Enter rejection reason here...",
+      "confirmReject": "Confirm Rejection"
+    },
+    "pending": {
+      "title": "Pending Requests",
+      "description": "Review and manage pending vacation requests",
+      "pendingRequests": "Pending Requests",
+      "pendingRequestsDescription": "Vacation requests that need review"
+    },
+    "team": {
+      "title": "My Team",
+      "description": "Manage your team members and view their information",
+      "teamMembers": "Team Members",
+      "teamMembersDescription": "List of all your team members",
+      "viewVacations": "View Vacations",
+      "contact": "Contact",
+      "noTeamMembers": "You don't have any team members yet"
+    },
+    "teamMember": {
+      "vacations": "Vacations",
+      "vacationsDescription": "View team member's vacation history",
+      "viewCalendar": "View in Calendar",
+      "vacationHistory": "Vacation History",
+      "vacationHistoryDescription": "All past and current vacation requests",
+      "adminNote": "Manager Note",
+      "noVacations": "This team member hasn't requested any vacations yet"
+    }
   }
 }

@@ -9,7 +9,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { Eye, EyeOff, Loader2, AlertCircle } from "lucide-react"
 import { signInWithEmail, signInWithProvider, persistSession, resendConfirmationEmail } from "@/lib/auth"
 import { useToast } from "@/hooks/use-toast"
-import { useLanguage } from "@/lib/i18n/client.tsx"
+import { useLanguage } from "@/lib/i18n/client"
 import { useTranslations } from "@/hooks/use-translations"
 
 import { Button } from "@/components/ui/button"
@@ -73,7 +73,9 @@ export function LoginForm({ error: initialError, redirectTo = "/" }: LoginFormPr
 
       if (error) {
         if (error.code === "EMAIL_NOT_CONFIRMED") {
-          setEmailToConfirm(error.email || values.email)
+          // Verificar si error es del tipo que tiene la propiedad email
+          const emailError = error as { message: string; code: string; email: string }
+          setEmailToConfirm(emailError.email || values.email)
           setLoginError(error.message)
         } else {
           setLoginError(error.message)

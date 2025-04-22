@@ -27,7 +27,19 @@ export interface Vacation {
   status: "pending" | "approved" | "rejected"
   created_at: string
   updated_at: string
-  vacation_type?: VacationType
+  admin_note?: string | null
+  vacation_types?: {
+    id: number
+    name: string
+    color: string
+    icon?: string
+  }
+  users?: {
+    id: string
+    name: string
+    email: string
+    profile_image_url?: string | null
+  }
 }
 
 export interface Notification {
