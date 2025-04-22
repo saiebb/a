@@ -4,21 +4,31 @@ import { UsersTable } from "@/components/admin/users-table"
 import { Button } from "@/components/ui/button"
 import { PlusCircle } from "lucide-react"
 import Link from "next/link"
+import { getTranslations, getLocale } from "@/lib/i18n/server"
 
 export default async function UsersPage() {
   const users = await getAllUsers()
   const userIsSuperAdmin = await isSuperAdmin()
 
+  // Get translations
+  const locale = await getLocale()
+  const { t } = await getTranslations(locale)
+
+  // Convert translations to strings to avoid type issues
+  const titleText = t("admin.users.title") as string
+  const descriptionText = t("admin.users.description") as string
+  const addUserText = t("admin.users.addUser") as string
+
   return (
-    <div className="p-6 space-y-6">
+    <div className="container py-6 space-y-6">
       <AdminHeader
-        title="User Management"
-        description="Manage employee accounts and permissions"
+        title={titleText}
+        description={descriptionText}
         action={
           <Button asChild>
             <Link href="/admin/users/new">
               <PlusCircle className="h-4 w-4 mr-2" />
-              Add User
+              {addUserText}
             </Link>
           </Button>
         }

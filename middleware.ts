@@ -35,6 +35,12 @@ export async function middleware(request: NextRequest) {
     ]
     const isPublicRoute = publicRoutes.some((route) => pathname.startsWith(route))
 
+    // Define admin routes
+    const isAdminRoute = pathname.startsWith("/admin")
+
+    // Define manager routes
+    const isManagerRoute = pathname.startsWith("/manager")
+
     // Check if onboarding has been completed
     const onboardingCompleted = request.cookies.get("onboardingCompleted")?.value === "true"
 
@@ -58,6 +64,36 @@ export async function middleware(request: NextRequest) {
     if (session && pathname === "/" && !onboardingCompleted && !onboardingShown) {
       // Redirect to onboarding
       return NextResponse.redirect(new URL("/onboarding", request.url))
+    }
+
+    // Check user role for admin routes
+    if (session && isAdminRoute) {
+      // Get user role from database
+      const { data: userData, error: userError } = await supabase
+        .from("users")
+        .select("role")
+        .eq("id", session.user.id)
+        .single()
+
+      if (userError || !userData || userData.role !== "admin") {
+        console.log("Access denied to admin route for user:", session.user.id)
+        return NextResponse.redirect(new URL("/", request.url))
+      }
+    }
+
+    // Check user role for manager routes
+    if (session && isManagerRoute) {
+      // Get user role from database
+      const { data: userData, error: userError } = await supabase
+        .from("users")
+        .select("role")
+        .eq("id", session.user.id)
+        .single()
+
+      if (userError || !userData || (userData.role !== "manager" && userData.role !== "admin")) {
+        console.log("Access denied to manager route for user:", session.user.id)
+        return NextResponse.redirect(new URL("/", request.url))
+      }
     }
 
     return response

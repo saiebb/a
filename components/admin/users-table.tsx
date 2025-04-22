@@ -19,6 +19,7 @@ import { formatDate } from "@/lib/utils"
 import { updateUserRole, updateUser, deleteUser } from "@/lib/admin-actions"
 import { Pencil, Trash2, Loader2, ShieldAlert, User, UserCog } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
+import { useTranslations } from "@/hooks/use-translations"
 import type { User as UserType } from "@/types"
 import type { UserRole } from "@/types/admin"
 
@@ -38,6 +39,7 @@ export function UsersTable({ users, isSuperAdmin }: UsersTableProps) {
     role: "user" as UserRole,
   })
   const { toast } = useToast()
+  const { t } = useTranslations()
 
   const handleEditUser = async () => {
     if (!selectedUser) return
@@ -156,25 +158,29 @@ export function UsersTable({ users, isSuperAdmin }: UsersTableProps) {
     }
   }
 
-  const getRoleBadge = (role: string) => {
+  const getRoleBadge = (role: string | undefined) => {
     switch (role) {
       case "super_admin":
-        return <Badge className="bg-purple-500 text-white">Super Admin</Badge>
+        return <Badge className="bg-purple-500 text-white">{t("admin.users.superAdmin") || "Super Admin"}</Badge>
       case "admin":
-        return <Badge className="bg-blue-500 text-white">Admin</Badge>
+        return <Badge className="bg-blue-500 text-white">{t("admin.users.admin") || "Admin"}</Badge>
+      case "manager":
+        return <Badge className="bg-green-500 text-white">{t("admin.users.manager") || "Manager"}</Badge>
       case "user":
-        return <Badge variant="outline">User</Badge>
+        return <Badge variant="outline">{t("admin.users.user") || "User"}</Badge>
       default:
-        return <Badge variant="outline">{role}</Badge>
+        return <Badge variant="outline">{role || t("admin.users.user") || "User"}</Badge>
     }
   }
 
-  const getRoleIcon = (role: string) => {
+  const getRoleIcon = (role: string | undefined) => {
     switch (role) {
       case "super_admin":
         return <ShieldAlert className="h-4 w-4 text-purple-500" />
       case "admin":
         return <UserCog className="h-4 w-4 text-blue-500" />
+      case "manager":
+        return <UserCog className="h-4 w-4 text-green-500" />
       case "user":
         return <User className="h-4 w-4 text-muted-foreground" />
       default:
@@ -183,7 +189,7 @@ export function UsersTable({ users, isSuperAdmin }: UsersTableProps) {
   }
 
   if (users.length === 0) {
-    return <div className="text-center py-8 text-muted-foreground">No users found.</div>
+    return <div className="text-center py-8 text-muted-foreground">{t("admin.users.noUsers") || "No users found."}</div>
   }
 
   return (
@@ -192,12 +198,12 @@ export function UsersTable({ users, isSuperAdmin }: UsersTableProps) {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Name</TableHead>
-              <TableHead>Email</TableHead>
-              <TableHead>Role</TableHead>
-              <TableHead>Vacation Days</TableHead>
-              <TableHead>Created</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
+              <TableHead>{t("admin.users.name")}</TableHead>
+              <TableHead>{t("admin.users.email")}</TableHead>
+              <TableHead>{t("admin.users.role")}</TableHead>
+              <TableHead>{t("admin.users.vacationDays")}</TableHead>
+              <TableHead>{t("admin.users.created")}</TableHead>
+              <TableHead className="text-right">{t("admin.users.actions")}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -230,7 +236,7 @@ export function UsersTable({ users, isSuperAdmin }: UsersTableProps) {
                       }}
                     >
                       <Pencil className="h-4 w-4 mr-1" />
-                      Edit
+                      {t("admin.users.edit")}
                     </Button>
 
                     {isSuperAdmin && (
@@ -249,7 +255,7 @@ export function UsersTable({ users, isSuperAdmin }: UsersTableProps) {
                           }}
                         >
                           <UserCog className="h-4 w-4 mr-1" />
-                          Role
+                          {t("admin.users.role")}
                         </Button>
 
                         <Button
@@ -262,7 +268,7 @@ export function UsersTable({ users, isSuperAdmin }: UsersTableProps) {
                           }}
                         >
                           <Trash2 className="h-4 w-4 mr-1" />
-                          Delete
+                          {t("admin.users.delete")}
                         </Button>
                       </>
                     )}
@@ -284,13 +290,13 @@ export function UsersTable({ users, isSuperAdmin }: UsersTableProps) {
       >
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Edit User</DialogTitle>
-            <DialogDescription>Update user information</DialogDescription>
+            <DialogTitle>{t("admin.users.editUser")}</DialogTitle>
+            <DialogDescription>{t("admin.users.editUserDescription")}</DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4 py-2">
             <div className="space-y-2">
-              <Label htmlFor="name">Name</Label>
+              <Label htmlFor="name">{t("admin.users.name")}</Label>
               <Input
                 id="name"
                 value={formData.name}
@@ -299,7 +305,7 @@ export function UsersTable({ users, isSuperAdmin }: UsersTableProps) {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">{t("admin.users.email")}</Label>
               <Input
                 id="email"
                 type="email"
@@ -309,7 +315,7 @@ export function UsersTable({ users, isSuperAdmin }: UsersTableProps) {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="vacationDays">Vacation Days</Label>
+              <Label htmlFor="vacationDays">{t("admin.users.vacationDays")}</Label>
               <Input
                 id="vacationDays"
                 type="number"
@@ -329,16 +335,16 @@ export function UsersTable({ users, isSuperAdmin }: UsersTableProps) {
               }}
               disabled={isSubmitting}
             >
-              Cancel
+              {t("admin.users.cancel")}
             </Button>
             <Button onClick={handleEditUser} disabled={isSubmitting}>
               {isSubmitting ? (
                 <>
                   <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  Saving...
+                  {t("admin.users.saving")}
                 </>
               ) : (
-                "Save Changes"
+                t("admin.users.saveChanges")
               )}
             </Button>
           </DialogFooter>
@@ -355,33 +361,36 @@ export function UsersTable({ users, isSuperAdmin }: UsersTableProps) {
       >
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Update User Role</DialogTitle>
-            <DialogDescription>Change the role and permissions for this user</DialogDescription>
+            <DialogTitle>{t("admin.users.updateRole")}</DialogTitle>
+            <DialogDescription>{t("admin.users.updateRoleDescription")}</DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4 py-2">
             <div className="space-y-2">
-              <Label htmlFor="role">Role</Label>
+              <Label htmlFor="role">{t("admin.users.role")}</Label>
               <Select
                 value={formData.role}
                 onValueChange={(value) => setFormData({ ...formData, role: value as UserRole })}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Select a role" />
+                  <SelectValue placeholder={t("admin.users.selectRole") || "Select a role"} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="user">User</SelectItem>
-                  <SelectItem value="admin">Admin</SelectItem>
-                  <SelectItem value="super_admin">Super Admin</SelectItem>
+                  <SelectItem value="user">{t("admin.users.user") || "User"}</SelectItem>
+                  <SelectItem value="manager">{t("admin.users.manager") || "Manager"}</SelectItem>
+                  <SelectItem value="admin">{t("admin.users.admin") || "Admin"}</SelectItem>
+                  <SelectItem value="super_admin">{t("admin.users.superAdmin") || "Super Admin"}</SelectItem>
                 </SelectContent>
               </Select>
 
               <p className="text-sm text-muted-foreground mt-2">
-                <span className="font-medium">User:</span> Can manage their own vacations
+                <span className="font-medium">{t("admin.users.user")}:</span> {t("admin.users.userRoleDescription")}
                 <br />
-                <span className="font-medium">Admin:</span> Can manage vacations and users
+                <span className="font-medium">{t("admin.users.manager")}:</span> {t("admin.users.managerRoleDescription")}
                 <br />
-                <span className="font-medium">Super Admin:</span> Has full access to all features
+                <span className="font-medium">{t("admin.users.admin")}:</span> {t("admin.users.adminRoleDescription")}
+                <br />
+                <span className="font-medium">{t("admin.users.superAdmin")}:</span> {t("admin.users.superAdminRoleDescription")}
               </p>
             </div>
           </div>
@@ -395,16 +404,16 @@ export function UsersTable({ users, isSuperAdmin }: UsersTableProps) {
               }}
               disabled={isSubmitting}
             >
-              Cancel
+              {t("admin.users.cancel")}
             </Button>
             <Button onClick={handleUpdateRole} disabled={isSubmitting}>
               {isSubmitting ? (
                 <>
                   <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  Updating...
+                  {t("admin.users.updating")}
                 </>
               ) : (
-                "Update Role"
+                t("admin.users.updateRole")
               )}
             </Button>
           </DialogFooter>
@@ -421,9 +430,9 @@ export function UsersTable({ users, isSuperAdmin }: UsersTableProps) {
       >
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Delete User</DialogTitle>
+            <DialogTitle>{t("admin.users.deleteUser")}</DialogTitle>
             <DialogDescription>
-              Are you sure you want to delete this user? This action cannot be undone.
+              {t("admin.users.deleteUserDescription")}
             </DialogDescription>
           </DialogHeader>
 
@@ -435,8 +444,7 @@ export function UsersTable({ users, isSuperAdmin }: UsersTableProps) {
               </div>
 
               <div className="text-sm text-destructive">
-                Warning: This will permanently delete the user account and all associated data, including vacation
-                records.
+                {t("admin.users.deleteWarning")}
               </div>
             </div>
           )}
@@ -450,16 +458,16 @@ export function UsersTable({ users, isSuperAdmin }: UsersTableProps) {
               }}
               disabled={isSubmitting}
             >
-              Cancel
+              {t("admin.users.cancel")}
             </Button>
             <Button variant="destructive" onClick={handleDeleteUser} disabled={isSubmitting}>
               {isSubmitting ? (
                 <>
                   <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  Deleting...
+                  {t("admin.users.deleting")}
                 </>
               ) : (
-                "Delete User"
+                t("admin.users.deleteUser")
               )}
             </Button>
           </DialogFooter>

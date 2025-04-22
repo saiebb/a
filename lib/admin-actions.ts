@@ -5,6 +5,7 @@ import { getServerSupabase } from "./supabase"
 import { validate as validateUUID } from "uuid"
 import type { AdminStats, UserRole, VacationWithUser } from "@/types/admin"
 import type { User } from "@/types"
+import type { Department } from "@/types/department"
 import { getServerUser } from "./server-auth"
 
 // Check if the current user is an admin
@@ -539,5 +540,304 @@ export async function deleteUser(userId: string): Promise<{ success: boolean; me
       success: false,
       message: "An unexpected error occurred",
     }
+  }
+}
+
+// Get all departments
+export async function getAllDepartments(): Promise<Department[]> {
+  try {
+    const supabase = getServerSupabase()
+
+    const { data, error } = await supabase
+      .from("departments")
+      .select(`
+        *,
+        manager:users(id, name, email)
+      `)
+      .order("name")
+
+    if (error) {
+      console.error("Error fetching departments:", error)
+      return []
+    }
+
+    return data || []
+  } catch (error) {
+    console.error("Error in getAllDepartments:", error)
+    return []
+  }
+}
+
+// Get department by ID
+export async function getDepartmentById(id: string): Promise<Department | null> {
+  // Validate UUID format
+  if (!id || !validateUUID(id)) {
+    return null
+  }
+
+  try {
+    const supabase = getServerSupabase()
+
+    const { data, error } = await supabase
+      .from("departments")
+      .select(`
+        *,
+        manager:users(id, name, email)
+      `)
+      .eq("id", id)
+      .single()
+
+    if (error) {
+      console.error("Error fetching department:", error)
+      return null
+    }
+
+    return data
+  } catch (error) {
+    console.error("Error in getDepartmentById:", error)
+    return null
+  }
+}
+
+// Create a new department
+export async function createDepartment(
+  name: string,
+  description?: string,
+  managerId?: string
+): Promise<{ success: boolean; message: string; department?: Department }> {
+  try {
+    // Check if the current user is an admin
+    const isUserAdmin = await isAdmin()
+
+    if (!isUserAdmin) {
+      return { success: false, message: "You don't have permission to perform this action" }
+    }
+
+    const supabase = getServerSupabase()
+
+    // Create the department
+    const { data, error } = await supabase
+      .from("departments")
+      .insert({
+        name,
+        description,
+        manager_id: managerId || null,
+      })
+      .select()
+      .single()
+
+    if (error) {
+      console.error("Error creating department:", error)
+      return { success: false, message: "Failed to create department" }
+    }
+
+    revalidatePath("/admin/departments")
+
+    return {
+      success: true,
+      message: "Department created successfully",
+      department: data,
+    }
+  } catch (error) {
+    console.error("Error in createDepartment:", error)
+    return { success: false, message: "An unexpected error occurred" }
+  }
+}
+
+// Update a department
+export async function updateDepartment(
+  id: string,
+  name: string,
+  description?: string,
+  managerId?: string
+): Promise<{ success: boolean; message: string }> {
+  // Validate UUID format
+  if (!id || !validateUUID(id)) {
+    return {
+      success: false,
+      message: "Invalid department ID format",
+    }
+  }
+
+  try {
+    // Check if the current user is an admin
+    const isUserAdmin = await isAdmin()
+
+    if (!isUserAdmin) {
+      return { success: false, message: "You don't have permission to perform this action" }
+    }
+
+    const supabase = getServerSupabase()
+
+    // Update the department
+    const { error } = await supabase
+      .from("departments")
+      .update({
+        name,
+        description,
+        manager_id: managerId || null,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", id)
+
+    if (error) {
+      console.error("Error updating department:", error)
+      return { success: false, message: "Failed to update department" }
+    }
+
+    revalidatePath("/admin/departments")
+    revalidatePath(`/admin/departments/${id}`)
+
+    return {
+      success: true,
+      message: "Department updated successfully",
+    }
+  } catch (error) {
+    console.error("Error in updateDepartment:", error)
+    return { success: false, message: "An unexpected error occurred" }
+  }
+}
+
+// Delete a department
+export async function deleteDepartment(id: string): Promise<{ success: boolean; message: string }> {
+  // Validate UUID format
+  if (!id || !validateUUID(id)) {
+    return {
+      success: false,
+      message: "Invalid department ID format",
+    }
+  }
+
+  try {
+    // Check if the current user is an admin
+    const isUserAdmin = await isAdmin()
+
+    if (!isUserAdmin) {
+      return { success: false, message: "You don't have permission to perform this action" }
+    }
+
+    const supabase = getServerSupabase()
+
+    // Check if there are users in this department
+    const { count, error: countError } = await supabase
+      .from("users")
+      .select("id", { count: "exact" })
+      .eq("department_id", id)
+
+    if (countError) {
+      console.error("Error checking department users:", countError)
+      return { success: false, message: "Failed to check department users" }
+    }
+
+    if (count && count > 0) {
+      return {
+        success: false,
+        message: "Cannot delete department with assigned users. Please reassign users first.",
+      }
+    }
+
+    // Delete the department
+    const { error } = await supabase
+      .from("departments")
+      .delete()
+      .eq("id", id)
+
+    if (error) {
+      console.error("Error deleting department:", error)
+      return { success: false, message: "Failed to delete department" }
+    }
+
+    revalidatePath("/admin/departments")
+
+    return {
+      success: true,
+      message: "Department deleted successfully",
+    }
+  } catch (error) {
+    console.error("Error in deleteDepartment:", error)
+    return { success: false, message: "An unexpected error occurred" }
+  }
+}
+
+// Get all users with manager role
+export async function getAllManagers(): Promise<{ id: string; name: string; email: string }[]> {
+  try {
+    const supabase = getServerSupabase()
+
+    const { data, error } = await supabase
+      .from("users")
+      .select("id, name, email")
+      .in("role", ["manager", "admin", "super_admin"])
+      .order("name")
+
+    if (error) {
+      console.error("Error fetching managers:", error)
+      return []
+    }
+
+    return data || []
+  } catch (error) {
+    console.error("Error in getAllManagers:", error)
+    return []
+  }
+}
+
+// Assign user to department
+export async function assignUserToDepartment(
+  userId: string,
+  departmentId: string | null
+): Promise<{ success: boolean; message: string }> {
+  // Validate UUID format
+  if (!userId || !validateUUID(userId)) {
+    return {
+      success: false,
+      message: "Invalid user ID format",
+    }
+  }
+
+  if (departmentId && !validateUUID(departmentId)) {
+    return {
+      success: false,
+      message: "Invalid department ID format",
+    }
+  }
+
+  try {
+    // Check if the current user is an admin
+    const isUserAdmin = await isAdmin()
+
+    if (!isUserAdmin) {
+      return { success: false, message: "You don't have permission to perform this action" }
+    }
+
+    const supabase = getServerSupabase()
+
+    // Update the user's department
+    const { error } = await supabase
+      .from("users")
+      .update({
+        department_id: departmentId,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", userId)
+
+    if (error) {
+      console.error("Error assigning user to department:", error)
+      return { success: false, message: "Failed to assign user to department" }
+    }
+
+    revalidatePath("/admin/users")
+    revalidatePath(`/admin/users/${userId}`)
+    revalidatePath("/admin/departments")
+
+    return {
+      success: true,
+      message: departmentId
+        ? "User assigned to department successfully"
+        : "User removed from department successfully",
+    }
+  } catch (error) {
+    console.error("Error in assignUserToDepartment:", error)
+    return { success: false, message: "An unexpected error occurred" }
   }
 }

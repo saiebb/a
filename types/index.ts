@@ -6,6 +6,9 @@ export interface User {
   updated_at: string
   total_vacation_days: number
   profile_image_url: string | null
+  role?: string
+  manager_id?: string | null
+  department_id?: string | null
 }
 
 export interface VacationType {
