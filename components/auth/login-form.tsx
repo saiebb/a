@@ -8,6 +8,7 @@ import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Eye, EyeOff, Loader2, AlertCircle } from "lucide-react"
 import { signInWithEmail, signInWithProvider, persistSession, resendConfirmationEmail } from "@/lib/auth"
+import { getRedirectPathByRole } from "@/lib/role-redirect"
 import { useToast } from "@/hooks/use-toast"
 import { useTranslations } from "@/hooks/use-translations"
 
@@ -68,7 +69,7 @@ export function LoginForm({ error: initialError, redirectTo = "/" }: LoginFormPr
       console.log("Attempting to sign in with email:", values.email)
 
       // Attempt to sign in
-      const { error } = await signInWithEmail(values.email, values.password)
+      const { data, error } = await signInWithEmail(values.email, values.password)
 
       if (error) {
         console.error("Login error:", error)
@@ -96,15 +97,33 @@ export function LoginForm({ error: initialError, redirectTo = "/" }: LoginFormPr
 
       console.log("Login successful, redirecting to:", redirectTo)
 
-      // Add a longer delay to ensure session is properly set
-      // This helps prevent the issue with double login screens in Next.js 15
-      console.log("Waiting for session to be properly set before redirecting...")
-      setTimeout(() => {
-        // Redirect to the specified path or dashboard
-        console.log("Now redirecting to:", redirectTo)
-        router.push(redirectTo)
-        router.refresh()
-      }, 1000)
+      // الحصول على معرف المستخدم من البيانات المُرجعة
+      const userId = data?.user?.id
+
+      if (userId) {
+        console.log("Getting redirect path based on user role...")
+        // الحصول على مسار إعادة التوجيه بناءً على دور المستخدم
+        const rolePath = await getRedirectPathByRole(userId, redirectTo)
+        console.log("Role-based redirect path:", rolePath)
+
+        // Add a longer delay to ensure session is properly set
+        // This helps prevent the issue with double login screens in Next.js 15
+        console.log("Waiting for session to be properly set before redirecting...")
+        setTimeout(() => {
+          // Redirect to the role-specific path
+          console.log("Now redirecting to:", rolePath)
+          router.push(rolePath)
+          router.refresh()
+        }, 1000)
+      } else {
+        // في حالة عدم وجود معرف للمستخدم، استخدم المسار الافتراضي
+        console.log("No user ID found, using default redirect path")
+        setTimeout(() => {
+          console.log("Now redirecting to:", redirectTo)
+          router.push(redirectTo)
+          router.refresh()
+        }, 1000)
+      }
     } catch (error) {
       console.error("Unexpected login error:", error)
       setLoginError(t("auth.unexpectedError", "An unexpected error occurred. Please try again."))

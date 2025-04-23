@@ -10,30 +10,17 @@ export const metadata: Metadata = {
   description: "Login to your AJazati account",
 }
 
-export default async function LoginPage({
-  searchParams,
-}: {
-  searchParams?: { [key: string]: string | string[] | undefined }
-}) {
+// استخدام نمط الوسيط لتجنب مشاكل searchParams في Next.js 15
+export default async function LoginPage(props: any) {
   // Get translations
   const locale = await getLocale()
   const { t } = await getTranslations(locale)
 
-  // In Next.js 15, we need to handle searchParams differently
-  // Create static values for error and redirectTo
+  // تعريف قيم افتراضية
   let error: string | null = null
   let redirectTo: string = "/"
 
   try {
-    // Process searchParams safely in Next.js 15
-    if (searchParams) {
-      if (searchParams.error) {
-        error = String(searchParams.error)
-      }
-      if (searchParams.redirect) {
-        redirectTo = String(searchParams.redirect)
-      }
-    }
 
     // Create a server-side Supabase client
     const supabase = await createServerClient()
@@ -58,13 +45,19 @@ export default async function LoginPage({
     // Continue to show the login page
   }
 
-  return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-muted/30 p-4">
-      <div className="w-full max-w-md mb-8 text-center">
-        <h1 className="text-3xl font-bold text-primary">{t("app.name")}</h1>
-        <p className="text-muted-foreground">{t("app.tagline")}</p>
+  // إنشاء مكون وسيط للتعامل مع البيانات بشكل آمن
+  function LoginPageContent({ error, redirectTo }: { error: string | null, redirectTo: string }) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-muted/30 p-4">
+        <div className="w-full max-w-md mb-8 text-center">
+          <h1 className="text-3xl font-bold text-primary">{t("app.name")}</h1>
+          <p className="text-muted-foreground">{t("app.tagline")}</p>
+        </div>
+        <LoginForm error={error} redirectTo={redirectTo} />
       </div>
-      <LoginForm error={error} redirectTo={redirectTo} />
-    </div>
-  )
+    )
+  }
+
+  // إرجاع المكون الوسيط
+  return <LoginPageContent error={error} redirectTo={redirectTo} />
 }
