@@ -1,13 +1,11 @@
-import { createServerComponentClient } from "@supabase/auth-helpers-nextjs"
-import { cookies } from "next/headers"
 import { redirect } from "next/navigation"
+import { createServerSupabaseClient } from "./supabase-server"
 import type { Database } from "@/types/database"
 
 // Create a Supabase client for server components
 export const createServerClient = async () => {
   try {
-    const cookieStore = await cookies()
-    return createServerComponentClient<Database>({ cookies: () => cookieStore })
+    return await createServerSupabaseClient()
   } catch (error) {
     console.error("Failed to create server Supabase client:", error)
     throw new Error("Authentication service initialization failed")
@@ -25,39 +23,41 @@ export async function getServerSession() {
   }
 }
 
-// Get the current user on the server
+// Get the current user on the server with full profile data
 export async function getServerUser() {
   try {
-    const {
-      data: { session },
-      error,
-    } = await getServerSession()
+    const supabase = await createServerClient()
+
+    // Use getUser() instead of getSession() for better security
+    const { data: { user }, error } = await supabase.auth.getUser()
 
     if (error) {
       console.error("Error getting server user:", error)
       return null
     }
 
-    if (!session?.user) {
+    if (!user) {
+      console.log("No authenticated user found")
       return null
     }
 
+    console.log("Authenticated user found:", user.id)
+
     // Get user data from the database to include role information
     // First try to find by ID
-    const supabase = await createServerClient()
     let { data: userData, error: userError } = await supabase
       .from("users")
       .select("*")
-      .eq("id", session.user.id)
+      .eq("id", user.id)
       .single()
 
     // If not found by ID, try to find by email
-    if (userError && session.user.email) {
+    if (userError && user.email) {
       console.log("User not found by ID, trying to find by email")
       const { data: userByEmail, error: emailError } = await supabase
         .from("users")
         .select("*")
-        .eq("email", session.user.email)
+        .eq("email", user.email)
         .single()
 
       if (!emailError) {
@@ -67,12 +67,56 @@ export async function getServerUser() {
     }
 
     if (userError) {
-      console.error("Error fetching user data:", userError)
-      return session.user
+      console.error("Error fetching user data:", userError, "for user ID:", user.id, "and email:", user.email)
+      // Don't return just the auth user, as it won't have the role information
+      // Instead, try to create a user record if it doesn't exist
+      if (user.email) {
+        console.log("Attempting to create user record for:", user.email)
+        try {
+          // Create a user object with the required fields
+          const newUserData = {
+            // Don't include id in the insert as it's auto-generated
+            email: user.email,
+            name: user.user_metadata?.name || user.email?.split("@")[0] || "User",
+            total_vacation_days: 21,
+            profile_image_url: null,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+            role: "user" // Default role
+          }
+
+          const { data: newUser, error: createError } = await supabase
+            .from("users")
+            .insert(newUserData)
+            .select()
+            .single()
+
+          if (createError) {
+            console.error("Error creating user record:", createError)
+            return user
+          }
+
+          // Create a merged user object with both auth and database properties
+          const mergedUser = { ...user } as any
+          if (newUser) {
+            Object.assign(mergedUser, newUser)
+          }
+
+          return mergedUser
+        } catch (insertError) {
+          console.error("Exception creating user record:", insertError)
+          return user
+        }
+      }
+      return user
     }
 
     // Merge the auth user with the database user data
-    return { ...session.user, ...userData }
+    const mergedUser = { ...user } as any
+    if (userData) {
+      Object.assign(mergedUser, userData)
+    }
+    return mergedUser
   } catch (error) {
     console.error("Unexpected error getting server user:", error)
     return null
@@ -82,16 +126,16 @@ export async function getServerUser() {
 // Require authentication for a server component
 export async function requireAuth() {
   try {
-    const {
-      data: { session },
-    } = await getServerSession()
+    const supabase = await createServerClient()
+    const { data: { user }, error } = await supabase.auth.getUser()
 
-    if (!session) {
+    if (error || !user) {
+      console.error("Authentication required but user not found:", error)
       // Instead of throwing an error, use the redirect function
       redirect("/auth/login")
     }
 
-    return session
+    return user
   } catch (error) {
     console.error("Unexpected error in requireAuth:", error)
     // If the error is a redirect, let it propagate
@@ -109,7 +153,7 @@ export async function getUserProfile(userId: string) {
 
     const supabase = await createServerClient()
 
-    const { data, error } = await supabase.from("users").select("*").eq("id", userId).single()
+    const { data, error } = await supabase.from("users").select("*").eq("id", userId as any).single()
 
     if (error) {
       console.error("Error fetching user profile:", error)
@@ -133,7 +177,7 @@ export async function getUserPreferences(userId: string) {
 
     const supabase = await createServerClient()
 
-    const { data, error } = await supabase.from("user_preferences").select("*").eq("user_id", userId).single()
+    const { data, error } = await supabase.from("user_preferences").select("*").eq("user_id", userId as any).single()
 
     if (error) {
       console.error("Error fetching user preferences:", error)
@@ -154,7 +198,7 @@ export async function checkUserExists(userId: string) {
 
     const supabase = await createServerClient()
 
-    const { data, error } = await supabase.from("users").select("id").eq("id", userId).single()
+    const { data, error } = await supabase.from("users").select("id").eq("id", userId as any).single()
 
     if (error || !data) {
       return false

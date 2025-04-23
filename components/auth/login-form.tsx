@@ -9,7 +9,6 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { Eye, EyeOff, Loader2, AlertCircle } from "lucide-react"
 import { signInWithEmail, signInWithProvider, persistSession, resendConfirmationEmail } from "@/lib/auth"
 import { useToast } from "@/hooks/use-toast"
-import { useLanguage } from "@/lib/i18n/client"
 import { useTranslations } from "@/hooks/use-translations"
 
 import { Button } from "@/components/ui/button"
@@ -42,8 +41,6 @@ export function LoginForm({ error: initialError, redirectTo = "/" }: LoginFormPr
   const [isLoading, setIsLoading] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   const [loginError, setLoginError] = useState<string | null>(initialError || null)
-  const [isCheckingSession, setIsCheckingSession] = useState(false)
-  const { isRTL } = useLanguage()
   const { t } = useTranslations()
 
   // Add a new state variable for tracking email confirmation errors and resend status
@@ -68,12 +65,16 @@ export function LoginForm({ error: initialError, redirectTo = "/" }: LoginFormPr
     setResendSuccess(false)
 
     try {
+      console.log("Attempting to sign in with email:", values.email)
+
       // Attempt to sign in
-      const { data, error } = await signInWithEmail(values.email, values.password)
+      const { error } = await signInWithEmail(values.email, values.password)
 
       if (error) {
+        console.error("Login error:", error)
+
         if (error.code === "EMAIL_NOT_CONFIRMED") {
-          // Verificar si error es del tipo que tiene la propiedad email
+          // Handle email confirmation error
           const emailError = error as { message: string; code: string; email: string }
           setEmailToConfirm(emailError.email || values.email)
           setLoginError(error.message)
@@ -93,11 +94,19 @@ export function LoginForm({ error: initialError, redirectTo = "/" }: LoginFormPr
         description: t("auth.welcomeBack", "Welcome back!"),
       })
 
-      // Redirect to the specified path or dashboard
-      router.push(redirectTo)
-      router.refresh()
+      console.log("Login successful, redirecting to:", redirectTo)
+
+      // Add a longer delay to ensure session is properly set
+      // This helps prevent the issue with double login screens in Next.js 15
+      console.log("Waiting for session to be properly set before redirecting...")
+      setTimeout(() => {
+        // Redirect to the specified path or dashboard
+        console.log("Now redirecting to:", redirectTo)
+        router.push(redirectTo)
+        router.refresh()
+      }, 1000)
     } catch (error) {
-      console.error("Login error:", error)
+      console.error("Unexpected login error:", error)
       setLoginError(t("auth.unexpectedError", "An unexpected error occurred. Please try again."))
       setIsLoading(false)
     }
@@ -154,15 +163,7 @@ export function LoginForm({ error: initialError, redirectTo = "/" }: LoginFormPr
     }
   }
 
-  if (isCheckingSession) {
-    return (
-      <Card className="w-full max-w-md mx-auto">
-        <CardContent className="flex items-center justify-center p-6">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        </CardContent>
-      </Card>
-    )
-  }
+
 
   return (
     <Card className="w-full max-w-md mx-auto">

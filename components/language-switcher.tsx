@@ -1,6 +1,6 @@
 "use client"
 
-import { useLanguage } from "@/lib/i18n/client.tsx"
+import { useLanguage } from "@/lib/i18n/client"
 import { Button } from "@/components/ui/button"
 import { Globe } from "lucide-react"
 import { localeNames, type Locale } from "@/lib/i18n/config"

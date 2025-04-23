@@ -12,15 +12,21 @@ export interface Database {
           created_at: string
           updated_at: string
           total_vacation_days: number
+          role: string | null
+          manager_id: string | null
+          department_id: string | null
         }
         Insert: {
-          id: string
+          id?: string
           name: string
           email: string
           profile_image_url?: string | null
           created_at?: string
           updated_at?: string
           total_vacation_days?: number
+          role?: string | null
+          manager_id?: string | null
+          department_id?: string | null
         }
         Update: {
           id?: string
@@ -30,6 +36,9 @@ export interface Database {
           created_at?: string
           updated_at?: string
           total_vacation_days?: number
+          role?: string | null
+          manager_id?: string | null
+          department_id?: string | null
         }
       }
       user_preferences: {

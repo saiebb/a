@@ -73,7 +73,7 @@ export default function OnboardingPage() {
   // Content steps (after language and theme selection)
   const contentSteps = [
     {
-      title: t("onboarding.welcome.title", "Welcome to Jazati"),
+      title: t("onboarding.welcome.title", "Welcome to AJazati"),
       description: t(
         "onboarding.welcome.description",
         "The optimal vacation management app to organize and track your vacations with ease",
@@ -157,7 +157,7 @@ export default function OnboardingPage() {
       title: t("onboarding.getStarted.title", "Let's Get Started"),
       description: t(
         "onboarding.getStarted.description",
-        "You are now ready to use the Jazati app. Click the button below to start managing your vacations",
+        "You are now ready to use the AJazati app. Click the button below to start managing your vacations",
       ),
       icon: (
         <div className="relative w-32 h-32 mx-auto mb-6">

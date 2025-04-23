@@ -50,12 +50,12 @@ export function VacationSummaryCard({ summary }: VacationSummaryCardProps) {
                   {summary.pending} / {summary.total}
                 </span>
               </div>
-              <Progress value={pendingPercentage} className="h-2 bg-muted" indicatorClassName="bg-amber-500" />
+              <Progress value={pendingPercentage} className="h-2 bg-muted" indicatorStyle={{ backgroundColor: "#f59e0b" }} />
             </div>
           )}
 
           <div className="pt-2 text-sm text-muted-foreground">
-            <p>{t("vacationSummary.annualAllowance", { days: summary.total })}</p>
+            <p>{t("vacationSummary.annualAllowance", { days: summary.total.toString() })}</p>
           </div>
         </div>
       </CardContent>

@@ -7,9 +7,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { ArrowLeft, Building, Calendar, Mail, User, Users } from "lucide-react"
 import { getDepartmentById, isAdmin } from "@/lib/admin-actions"
 import { formatDate } from "@/lib/utils"
-import { EditDepartmentButton } from "@/components/admin/edit-department-button"
-import { DeleteDepartmentButton } from "@/components/admin/delete-department-button"
-import { DepartmentUsersList } from "@/components/admin/department-users-list"
+import { EditDepartmentButton } from "@/components/admin/edit-department-btn"
+import { DeleteDepartmentButton } from "@/components/admin/delete-department-btn"
+import { DepartmentUsersList } from "@/components/admin/department-users-list-component"
 
 interface DepartmentPageProps {
   params: {

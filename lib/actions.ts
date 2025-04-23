@@ -179,6 +179,8 @@ export async function getUserVacationsForCalendar(userId: string): Promise<Vacat
         end_date,
         status,
         notes,
+        created_at,
+        updated_at,
         vacation_type:vacation_types(*)
       `)
       .eq("user_id", userId)

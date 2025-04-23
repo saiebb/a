@@ -14,7 +14,7 @@ import {
 import { getUserNotifications, markNotificationAsRead } from "@/lib/actions"
 import type { Notification } from "@/types"
 import { formatDistanceToNow } from "date-fns"
-import { getCurrentUser } from "@/lib/auth"
+import { getCurrentUser } from "@/lib/supabase-client"
 
 export function NotificationsDropdown() {
   const [notifications, setNotifications] = useState<Notification[]>([])
@@ -51,6 +51,12 @@ export function NotificationsDropdown() {
       try {
         setLoading(true)
         setError(null)
+
+        // Make sure userId is not null before calling getUserNotifications
+        if (!userId) {
+          setError("User ID is missing")
+          return
+        }
 
         const data = await getUserNotifications(userId)
 

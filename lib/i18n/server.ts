@@ -66,7 +66,7 @@ export async function getTranslations(passedLocale?: Locale) {
                 if (defaultResult && typeof defaultResult === 'object' && k in defaultResult) {
                   defaultResult = defaultResult[k]
                 } else {
-                  defaultResult = null
+                  defaultResult = {} as Record<string, any>
                   break
                 }
               }
@@ -84,10 +84,13 @@ export async function getTranslations(passedLocale?: Locale) {
         if (typeof result === 'string') {
           // Handle any values for replacement
           if (values) {
-            return Object.entries(values).reduce(
-              (str, [key, value]) => str.replace(`{${key}}`, String(value)),
-              result
-            )
+            let translatedText = result as string
+            // Manually replace each placeholder
+            Object.keys(values).forEach(key => {
+              const regex = new RegExp(`\\{${key}\\}`, 'g')
+              translatedText = translatedText.replace(regex, String(values[key]))
+            })
+            return translatedText
           }
           return result
         }

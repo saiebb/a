@@ -3,22 +3,23 @@
 import Link from "next/link"
 import { useTranslations } from "@/hooks/use-translations"
 import { Button } from "@/components/ui/button"
-import { 
-  DropdownMenu, 
-  DropdownMenuContent, 
-  DropdownMenuItem, 
-  DropdownMenuLabel, 
-  DropdownMenuSeparator, 
-  DropdownMenuTrigger 
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu"
-import { 
-  Users, 
-  Building, 
-  Calendar, 
-  Settings, 
-  ChevronDown, 
+import {
+  Users,
+  Building,
+  Calendar,
+  Settings,
+  ChevronDown,
   LayoutDashboard,
-  LogOut
+  LogOut,
+  Tag
 } from "lucide-react"
 
 export function AdminLayoutHeader() {
@@ -29,7 +30,7 @@ export function AdminLayoutHeader() {
       <div className="container flex h-14 items-center">
         <div className="mr-4 flex">
           <Link href="/admin" className="flex items-center space-x-2">
-            <span className="font-bold text-lg">{t("common.jazatiAdmin")}</span>
+            <span className="font-bold text-lg">{t("common.AJazatiAdmin")}</span>
           </Link>
         </div>
         <div className="flex items-center justify-between flex-1">
@@ -56,6 +57,12 @@ export function AdminLayoutHeader() {
               <Link href="/admin/vacations">
                 <Calendar className="h-4 w-4 mr-2" />
                 {t("admin.vacations.title")}
+              </Link>
+            </Button>
+            <Button asChild variant="ghost" size="sm">
+              <Link href="/admin/vacation-types">
+                <Tag className="h-4 w-4 mr-2" />
+                {t("admin.vacationTypes.title")}
               </Link>
             </Button>
           </nav>

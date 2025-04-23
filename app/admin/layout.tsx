@@ -4,8 +4,8 @@ import { isAdmin } from "@/lib/admin-actions"
 import { AdminLayout } from "@/components/admin/admin-layout"
 
 export const metadata = {
-  title: "Admin Dashboard | Jazati",
-  description: "Administrative dashboard for Jazati vacation management system",
+  title: "Admin Dashboard | AJazati",
+  description: "Administrative dashboard for AJazati vacation management system",
 }
 
 export default async function AdminLayout({

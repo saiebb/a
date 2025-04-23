@@ -6,8 +6,8 @@ import { getTranslations } from "@/lib/i18n/server"
 import { getLocale } from "@/lib/i18n/server"
 
 export const metadata: Metadata = {
-  title: "Sign Up | Jazati",
-  description: "Create a new Jazati account",
+  title: "Sign Up | AJazati",
+  description: "Create a new AJazati account",
 }
 
 export default async function SignupPage() {
@@ -26,7 +26,7 @@ export default async function SignupPage() {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-muted/30 p-4">
       <div className="w-full max-w-md mb-8 text-center">
-        <h1 className="text-3xl font-bold text-primary">{t("app.name", "Jazati")}</h1>
+        <h1 className="text-3xl font-bold text-primary">{t("app.name", "AJazati")}</h1>
         <p className="text-muted-foreground">{t("app.tagline", "Manage your vacation days efficiently")}</p>
       </div>
       <SignupForm />

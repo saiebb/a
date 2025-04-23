@@ -1,7 +1,8 @@
-import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs"
+import { createClient } from "@supabase/supabase-js"
 import { cookies } from "next/headers"
 import { NextResponse } from "next/server"
 import type { NextRequest } from "next/server"
+import type { Database } from "@/types/database"
 
 export async function GET(request: NextRequest) {
   try {
@@ -13,8 +14,33 @@ export async function GET(request: NextRequest) {
 
     // Handle email confirmation specifically
     if (type === "email_confirmation" || type === "signup") {
-      const cookieStore = cookies()
-      const supabase = createRouteHandlerClient({ cookies: () => cookieStore })
+      // Crear un cliente de Supabase para el manejador de rutas
+      const supabase = createClient<Database>(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+        {
+          auth: {
+            persistSession: false,
+            autoRefreshToken: false,
+            detectSessionInUrl: false,
+            storage: {
+              getItem: (key: string) => {
+                const cookieStore = cookies()
+                const cookie = cookieStore.get(key)
+                return cookie?.value ?? null
+              },
+              setItem: (key: string, value: string) => {
+                const cookieStore = cookies()
+                cookieStore.set(key, value)
+              },
+              removeItem: (key: string) => {
+                const cookieStore = cookies()
+                cookieStore.set(key, "", { maxAge: 0 })
+              },
+            },
+          },
+        }
+      )
 
       if (code) {
         // Exchange the code for a session
@@ -94,8 +120,33 @@ export async function GET(request: NextRequest) {
       return NextResponse.redirect(new URL("/auth/login?error=Authentication failed", request.url))
     }
 
-    const cookieStore = cookies()
-    const supabase = createRouteHandlerClient({ cookies: () => cookieStore })
+    // Crear un cliente de Supabase para el manejador de rutas
+    const supabase = createClient<Database>(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        auth: {
+          persistSession: false,
+          autoRefreshToken: false,
+          detectSessionInUrl: false,
+          storage: {
+            getItem: (key: string) => {
+              const cookieStore = cookies()
+              const cookie = cookieStore.get(key)
+              return cookie?.value ?? null
+            },
+            setItem: (key: string, value: string) => {
+              const cookieStore = cookies()
+              cookieStore.set(key, value)
+            },
+            removeItem: (key: string) => {
+              const cookieStore = cookies()
+              cookieStore.set(key, "", { maxAge: 0 })
+            },
+          },
+        },
+      }
+    )
 
     // Exchange the code for a session
     const { error: sessionError } = await supabase.auth.exchangeCodeForSession(code)

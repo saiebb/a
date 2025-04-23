@@ -59,7 +59,7 @@ export function AdminSidebar() {
     <div className="flex flex-col h-full">
       <div className="flex items-center h-16 px-6 border-b">
         <Link href="/admin" className="flex items-center gap-2">
-          <span className="font-bold text-xl text-primary">Jazati Admin</span>
+          <span className="font-bold text-xl text-primary">AJazati Admin</span>
         </Link>
       </div>
       <div className="flex-1 py-6 px-4">
@@ -112,7 +112,7 @@ export function AdminSidebar() {
             <SidebarContent />
           </SheetContent>
         </Sheet>
-        <div className="ml-4 font-bold">Jazati Admin</div>
+        <div className="ml-4 font-bold">AJazati Admin</div>
       </div>
 
       {/* Desktop Sidebar */}

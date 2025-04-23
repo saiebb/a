@@ -1,14 +1,13 @@
 import type { Metadata } from "next"
 import { LoginForm } from "@/components/auth/login-form"
-import { cookies } from "next/headers"
-import { createServerComponentClient } from "@supabase/auth-helpers-nextjs"
+import { createServerClient } from "@/lib/server-auth"
 import { redirect } from "next/navigation"
 import { getTranslations } from "@/lib/i18n/server"
 import { getLocale } from "@/lib/i18n/server"
 
 export const metadata: Metadata = {
-  title: "Login | Jazati",
-  description: "Login to your Jazati account",
+  title: "Login | AJazati",
+  description: "Login to your AJazati account",
 }
 
 export default async function LoginPage({
@@ -16,32 +15,54 @@ export default async function LoginPage({
 }: {
   searchParams?: { [key: string]: string | string[] | undefined }
 }) {
+  // Get translations
   const locale = await getLocale()
   const { t } = await getTranslations(locale)
 
-  // Get error from query params if it exists
-  const error = searchParams?.error ? String(searchParams.error) : null
-  const redirectTo = searchParams?.redirect ? String(searchParams.redirect) : "/"
+  // In Next.js 15, we need to handle searchParams differently
+  // Create static values for error and redirectTo
+  let error: string | null = null
+  let redirectTo: string = "/"
 
-  // Create a supabase client for server components
-  const cookieStore = cookies()
-  const supabase = createServerComponentClient({ cookies: () => cookieStore })
+  try {
+    // Process searchParams safely in Next.js 15
+    if (searchParams) {
+      if (searchParams.error) {
+        error = String(searchParams.error)
+      }
+      if (searchParams.redirect) {
+        redirectTo = String(searchParams.redirect)
+      }
+    }
 
-  // Check if user is already logged in - don't use try/catch here to avoid catching redirects as errors
-  const {
-    data: { session },
-  } = await supabase.auth.getSession()
+    // Create a server-side Supabase client
+    const supabase = await createServerClient()
 
-  // If user is logged in and there's no error, redirect to home page
-  if (session && !error) {
-    redirect("/")
+    // Check if user is already logged in - use getSession for more reliable results
+    const { data: { session }, error: sessionError } = await supabase.auth.getSession()
+
+    // If user is authenticated and there's no error parameter, redirect to home page
+    if (session?.user && !error) {
+      console.log("User already authenticated, redirecting to home")
+      redirect(redirectTo)
+    }
+
+    // If there was a session error, log it but continue to show the login page
+    if (sessionError) {
+      console.error("Session error in login page:", sessionError)
+      // We don't redirect here, just show the login page
+    }
+  } catch (err) {
+    // Log any unexpected errors but don't crash
+    console.error("Unexpected error in login page:", err)
+    // Continue to show the login page
   }
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-muted/30 p-4">
       <div className="w-full max-w-md mb-8 text-center">
-        <h1 className="text-3xl font-bold text-primary">{t("app.name", "Jazati")}</h1>
-        <p className="text-muted-foreground">{t("app.tagline", "Manage your vacation days efficiently")}</p>
+        <h1 className="text-3xl font-bold text-primary">{t("app.name")}</h1>
+        <p className="text-muted-foreground">{t("app.tagline")}</p>
       </div>
       <LoginForm error={error} redirectTo={redirectTo} />
     </div>

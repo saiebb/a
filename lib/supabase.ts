@@ -13,21 +13,35 @@ export const getServerSupabase = () => {
 }
 
 export const createClient = (cookieStore: ReadonlyRequestCookies) => {
-  return createSupabaseClient(
-    supabaseUrl,
-    supabaseAnonKey,
-    {
-      cookies: {
-        get(name: string) {
-          return cookieStore.get(name)?.value
+  // Usar una función que simula el comportamiento de cookies() de Next.js
+  const cookiesAdapter = {
+    get: (name: string) => cookieStore.get(name)?.value,
+    set: (name: string, value: string, options: { path?: string; maxAge?: number; domain?: string; secure?: boolean }) => {
+      cookieStore.set({ name, value, ...options })
+    },
+    remove: (name: string, options: { path?: string; domain?: string }) => {
+      cookieStore.set({ name, value: "", ...options, maxAge: 0 })
+    },
+  }
+
+  // Crear un cliente Supabase con las cookies proporcionadas
+  return createSupabaseClient(supabaseUrl, supabaseAnonKey, {
+    global: {
+      fetch: undefined, // Usar el fetch predeterminado
+    },
+    auth: {
+      storage: {
+        getItem: (key) => {
+          const value = cookiesAdapter.get(key)
+          return value ?? null
         },
-        set(name: string, value: string, options: { path?: string; maxAge?: number; domain?: string; secure?: boolean }) {
-          cookieStore.set({ name, value, ...options })
+        setItem: (key, value) => {
+          cookiesAdapter.set(key, value, { path: "/" })
         },
-        remove(name: string, options: { path?: string; domain?: string }) {
-          cookieStore.set({ name, value: "", ...options, maxAge: 0 })
+        removeItem: (key) => {
+          cookiesAdapter.remove(key, { path: "/" })
         },
       },
-    }
-  )
+    },
+  })
 }

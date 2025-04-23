@@ -50,7 +50,7 @@ const ibmPlexSansArabic = localFont({
 })
 
 export const metadata: Metadata = {
-  title: "Jazati - My Vacation",
+  title: "AJazati - My Vacation",
   description: "Manage your vacation days efficiently",
     generator: 'v0.dev'
 }

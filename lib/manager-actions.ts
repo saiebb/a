@@ -3,8 +3,7 @@
 import { revalidatePath } from "next/cache"
 import { cookies } from "next/headers"
 import { createClient } from "@/lib/supabase"
-import type { Vacation } from "@/types"
-import type { TeamVacationSummary } from "@/types/manager"
+import type { Vacation, TeamVacationSummary, TeamMember } from "@/types"
 
 /**
  * الحصول على ملخص إجازات الفريق
@@ -38,7 +37,7 @@ export async function getTeamVacationSummary(managerId?: string): Promise<TeamVa
     // الحصول على عدد الإجازات المعلقة
     const { count: pendingCount, error: pendingError } = await supabase
       .from("vacations")
-      .select("id", { count: true })
+      .select("id", { count: "exact" })
       .in("user_id", teamMembers.map(member => member.id))
       .eq("status", "pending")
 
@@ -54,7 +53,7 @@ export async function getTeamVacationSummary(managerId?: string): Promise<TeamVa
 
     const { count: upcomingCount, error: upcomingError } = await supabase
       .from("vacations")
-      .select("id", { count: true })
+      .select("id", { count: "exact" })
       .in("user_id", teamMembers.map(member => member.id))
       .eq("status", "approved")
       .gte("start_date", today.toISOString().split("T")[0])
@@ -68,7 +67,7 @@ export async function getTeamVacationSummary(managerId?: string): Promise<TeamVa
     // الحصول على عدد الموظفين في إجازة اليوم
     const { count: onVacationCount, error: onVacationError } = await supabase
       .from("vacations")
-      .select("id", { count: true })
+      .select("id", { count: "exact" })
       .in("user_id", teamMembers.map(member => member.id))
       .eq("status", "approved")
       .lte("start_date", today.toISOString().split("T")[0])
@@ -99,7 +98,7 @@ export async function getTeamVacationSummary(managerId?: string): Promise<TeamVa
     for (const type of vacationsByType) {
       const { count, error: countError } = await supabase
         .from("vacations")
-        .select("id", { count: true })
+        .select("id", { count: "exact" })
         .in("user_id", teamMembers.map(member => member.id))
         .eq("status", "approved")
         .eq("vacation_type_id", type.id);

@@ -1,26 +1,15 @@
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs"
 import type { Provider } from "@supabase/supabase-js"
 import type { Database } from "@/types/database"
+import { supabase } from "./supabase-client"
 
-// Create a singleton Supabase client for client-side components
-let supabaseClient: ReturnType<typeof createClientComponentClient<Database>> | null = null
-
+// Export the supabase client for backward compatibility
 export const createClient = () => {
-  if (!supabaseClient) {
-    try {
-      supabaseClient = createClientComponentClient<Database>()
-    } catch (error) {
-      console.error("Failed to initialize Supabase client:", error)
-      throw new Error("Authentication service initialization failed")
-    }
-  }
-  return supabaseClient
+  return supabase
 }
 
 // Check if user is authenticated
 export async function checkUserAuthenticated() {
   try {
-    const supabase = createClient()
     const {
       data: { session },
       error,
@@ -41,7 +30,6 @@ export async function checkUserAuthenticated() {
 // Get current user
 export async function getCurrentUser() {
   try {
-    const supabase = createClient()
     const {
       data: { user },
       error,
@@ -62,8 +50,6 @@ export async function getCurrentUser() {
 // Sign in with email and password
 export async function signInWithEmail(email: string, password: string) {
   try {
-    const supabase = createClient()
-
     // Validate inputs
     if (!email || !password) {
       return {
@@ -124,8 +110,6 @@ export async function signInWithEmail(email: string, password: string) {
 // Sign up with email and password
 export async function signUpWithEmail(email: string, password: string, name: string) {
   try {
-    const supabase = createClient()
-
     // First, create the auth user
     const { data: authData, error: authError } = await supabase.auth.signUp({
       email,
@@ -183,7 +167,6 @@ export async function signUpWithEmail(email: string, password: string, name: str
 // Sign in with OAuth provider
 export async function signInWithProvider(provider: Provider) {
   try {
-    const supabase = createClient()
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider,
       options: {
@@ -204,7 +187,6 @@ export async function signInWithProvider(provider: Provider) {
 // Sign out
 export async function signOut() {
   try {
-    const supabase = createClient()
     const { error } = await supabase.auth.signOut()
 
     if (error) {
@@ -221,8 +203,6 @@ export async function signOut() {
 // Reset password
 export async function resetPassword(email: string) {
   try {
-    const supabase = createClient()
-
     if (!email) {
       return {
         data: null,
@@ -247,7 +227,6 @@ export async function resetPassword(email: string) {
 // Update user profile
 export async function updateUserProfile(name: string, email: string) {
   try {
-    const supabase = createClient()
     const { data: userData, error: userError } = await supabase.auth.updateUser({
       email,
       data: { name },
@@ -285,15 +264,18 @@ export async function updateUserProfile(name: string, email: string) {
 // Persist session
 export async function persistSession(rememberMe = false) {
   try {
-    const supabase = createClient()
-
     // If rememberMe is true, set session persistence to 'local' (persists indefinitely)
     // Otherwise, use 'session' (persists until browser is closed)
     const persistenceMode = rememberMe ? "local" : "session"
 
-    await supabase.auth.setSession({
-      persistSession: persistenceMode === "local",
-    })
+    // Set the persistence mode
+    if (typeof window !== "undefined") {
+      if (persistenceMode === "local") {
+        localStorage.setItem("supabase.auth.persistence", "local")
+      } else {
+        localStorage.setItem("supabase.auth.persistence", "session")
+      }
+    }
 
     return { error: null }
   } catch (error) {
@@ -305,7 +287,6 @@ export async function persistSession(rememberMe = false) {
 // Get session data
 export async function getSessionData() {
   try {
-    const supabase = createClient()
     const { data, error } = await supabase.auth.getSession()
 
     if (error) {
@@ -323,9 +304,7 @@ export async function getSessionData() {
 // Add a new function to resend confirmation email
 export async function resendConfirmationEmail(email: string) {
   try {
-    const supabase = createClient()
-
-    const { data, error } = await supabase.auth.resend({
+    const { error } = await supabase.auth.resend({
       type: "signup",
       email: email,
     })

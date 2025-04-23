@@ -1,6 +1,6 @@
 {
   "app": {
-    "name": "Jazati",
+    "name": "AJazati",
     "tagline": "Manage your vacation days efficiently"
   },
   "common": {
@@ -31,7 +31,7 @@
     "assign": "Assign",
     "assigning": "Assigning...",
     "backToDashboard": "Back to Dashboard",
-    "jazatiAdmin": "Jazati Admin",
+    "AJazatiAdmin": "AJazati Admin",
     "manageEmployees": "Manage Employees",
     "dashboard": "Dashboard",
     "settings": "Settings",
@@ -233,7 +233,7 @@
   },
   "onboarding": {
     "welcome": {
-      "title": "Welcome to Jazati",
+      "title": "Welcome to AJazati",
       "description": "The optimal vacation management app to organize and track your vacations with ease"
     },
     "addVacation": {
@@ -246,7 +246,7 @@
     },
     "getStarted": {
       "title": "Let's Get Started",
-      "description": "You are now ready to use the Jazati app. Click the button below to start managing your vacations"
+      "description": "You are now ready to use the AJazati app. Click the button below to start managing your vacations"
     }
   },
   "notifications": {
@@ -326,6 +326,36 @@
     }
   },
   "admin": {
+    "vacationTypes": {
+      "title": "Vacation Types",
+      "description": "Manage and customize vacation types",
+      "createType": "Create Vacation Type",
+      "createTypeDescription": "Create a new vacation type in the system",
+      "editType": "Edit Vacation Type",
+      "editTypeDescription": "Edit vacation type information",
+      "deleteType": "Delete Vacation Type",
+      "deleteTypeDescription": "Are you sure you want to delete this type?",
+      "deleteWarning": "Warning: Cannot delete vacation types that are being used in current vacation requests.",
+      "typesList": "Vacation Types List",
+      "typesListDescription": "All vacation types available in the system",
+      "noTypes": "No vacation types yet",
+      "name": "Name",
+      "description": "Description",
+      "color": "Color",
+      "icon": "Icon",
+      "namePlaceholder": "Enter vacation type name",
+      "descriptionPlaceholder": "Enter vacation type description (optional)",
+      "iconPlaceholder": "Enter icon name",
+      "iconHelp": "Enter an icon name from Lucide library or leave it empty",
+      "nameRequired": "Vacation type name is required",
+      "colorRequired": "Vacation type color is required",
+      "typeCreated": "Vacation Type Created",
+      "typeUpdated": "Vacation Type Updated",
+      "typeDeleted": "Vacation Type Deleted",
+      "createFailed": "Failed to create vacation type",
+      "updateFailed": "Failed to update vacation type",
+      "deleteFailed": "Failed to delete vacation type"
+    },
     "dashboard": {
       "title": "Admin Dashboard",
       "description": "Manage system, users, and vacations",

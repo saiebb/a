@@ -1,29 +1,15 @@
 import { NextResponse } from "next/server"
 import type { NextRequest } from "next/server"
-import { createMiddlewareClient } from "@supabase/auth-helpers-nextjs"
+import { createClient } from "@supabase/supabase-js"
+import type { Database } from "@/types/database"
 
 export async function middleware(request: NextRequest) {
   try {
+    // Create a response object that we'll return at the end
     const response = NextResponse.next()
-    const supabase = createMiddlewareClient({ req: request, res: response })
-
-    // Check if the user is authenticated
-    const {
-      data: { session },
-      error,
-    } = await supabase.auth.getSession()
-
-    if (error) {
-      console.error("Middleware session error:", error)
-      // Continue to the requested page, authentication will be handled there if needed
-      return response
-    }
 
     // Get the pathname from the request
     const { pathname, searchParams } = request.nextUrl
-
-    // Handle error query parameter for login page
-    const errorParam = searchParams.get("error")
 
     // Define public routes that don't require authentication
     const publicRoutes = [
@@ -34,6 +20,63 @@ export async function middleware(request: NextRequest) {
       "/auth/reset-password",
     ]
     const isPublicRoute = publicRoutes.some((route) => pathname.startsWith(route))
+
+    // Define static assets and API routes that should bypass auth checks
+    const bypassRoutes = [
+      "/_next",
+      "/api",
+      "/favicon.ico",
+      "/images",
+      "/fonts",
+    ]
+    const shouldBypass = bypassRoutes.some((route) => pathname.startsWith(route))
+
+    // Skip middleware for static assets and API routes
+    if (shouldBypass) {
+      return response
+    }
+
+    // Create a Supabase client for the middleware
+    // In Next.js 15, we need to be more careful with cookies
+    const supabase = createClient<Database>(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        auth: {
+          persistSession: false,
+          autoRefreshToken: false,
+          detectSessionInUrl: false,
+        },
+      }
+    )
+
+    // Check if the user is authenticated - use getSession() for middleware
+    // This is more reliable in middleware context
+    const {
+      data: { session: authSession },
+      error,
+    } = await supabase.auth.getSession()
+
+    // Get user from session if available
+    const user = authSession?.user || null
+
+    if (error) {
+      console.error("Middleware auth error:", error)
+      // If there's an auth error and this is not a public route, redirect to login
+      if (!isPublicRoute) {
+        const redirectUrl = new URL("/auth/login", request.url)
+        redirectUrl.searchParams.set("redirect", pathname)
+        return NextResponse.redirect(redirectUrl)
+      }
+      // Otherwise continue to the requested page
+      return response
+    }
+
+    // Create a session-like object for backward compatibility
+    const session = user ? { user } : null
+
+    // Handle error query parameter for login page
+    const errorParam = searchParams.get("error")
 
     // Define admin routes
     const isAdminRoute = pathname.startsWith("/admin")
@@ -57,6 +100,7 @@ export async function middleware(request: NextRequest) {
 
     // If user is authenticated and trying to access auth routes
     if (session && isPublicRoute && !errorParam) {
+      // Don't redirect if there's an error parameter
       return NextResponse.redirect(new URL("/", request.url))
     }
 
@@ -75,8 +119,8 @@ export async function middleware(request: NextRequest) {
         .eq("id", session.user.id)
         .single()
 
-      if (userError || !userData || userData.role !== "admin") {
-        console.log("Access denied to admin route for user:", session.user.id)
+      if (userError || !userData || (userData.role !== "admin" && userData.role !== "super_admin")) {
+        console.log("Access denied to admin route for user:", session.user.id, "with role:", userData?.role)
         return NextResponse.redirect(new URL("/", request.url))
       }
     }
@@ -90,8 +134,8 @@ export async function middleware(request: NextRequest) {
         .eq("id", session.user.id)
         .single()
 
-      if (userError || !userData || (userData.role !== "manager" && userData.role !== "admin")) {
-        console.log("Access denied to manager route for user:", session.user.id)
+      if (userError || !userData || (userData.role !== "manager" && userData.role !== "admin" && userData.role !== "super_admin")) {
+        console.log("Access denied to manager route for user:", session.user.id, "with role:", userData?.role)
         return NextResponse.redirect(new URL("/", request.url))
       }
     }

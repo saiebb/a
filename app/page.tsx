@@ -8,7 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Skeleton } from "@/components/ui/skeleton"
 import { PlusCircle, Calendar, AlertCircle } from "lucide-react"
 import Link from "next/link"
-import { getServerSession, getServerUser } from "@/lib/server-auth"
+import { getServerUser } from "@/lib/server-auth"
 import { getUserVacations, getVacationSummary } from "@/lib/actions"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import type { Vacation } from "@/types"
@@ -138,24 +138,12 @@ export default async function Home() {
   let error = null
 
   try {
-    // Get the current session
-    const { data: sessionData, error: sessionError } = await getServerSession()
+    // Get the current user directly instead of session
+    const user = await getServerUser()
 
-    // If there's a session error or no session, show the welcome page
-    if (sessionError || !sessionData.session) {
-      if (sessionError) {
-        console.error("Error getting session:", sessionError)
-      } else {
-        console.log("No active session found, showing welcome page")
-      }
-      return <WelcomePage />
-    }
-
-    // Get the current user from the session
-    const user = sessionData.session.user
-
+    // If no user is found, show the welcome page
     if (!user) {
-      console.error("User information not found in session")
+      console.log("No authenticated user found, showing welcome page")
       return <WelcomePage />
     }
 

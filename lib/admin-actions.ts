@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache"
 import { getServerSupabase } from "./supabase"
 import { validate as validateUUID } from "uuid"
 import type { AdminStats, UserRole, VacationWithUser } from "@/types/admin"
-import type { User } from "@/types"
+import type { User, VacationType } from "@/types"
 import type { Department } from "@/types/department"
 import { getServerUser } from "./server-auth"
 
@@ -13,14 +13,33 @@ export async function isAdmin(): Promise<boolean> {
   try {
     const user = await getServerUser()
 
-    if (!user?.id) return false
+    if (!user?.id) {
+      console.log("isAdmin: No user ID found")
+      return false
+    }
 
+    // If the user object already has a role property, use it
+    if (user.role) {
+      console.log("isAdmin: User has role property:", user.role)
+      return user.role === "admin" || user.role === "super_admin"
+    }
+
+    // Otherwise, query the database
     const supabase = getServerSupabase()
 
     const { data, error } = await supabase.from("users").select("role").eq("id", user.id).single()
 
-    if (error || !data) return false
+    if (error) {
+      console.error("isAdmin: Error fetching user role:", error)
+      return false
+    }
 
+    if (!data) {
+      console.log("isAdmin: No data returned for user ID:", user.id)
+      return false
+    }
+
+    console.log("isAdmin: User role from database:", data.role)
     return data.role === "admin" || data.role === "super_admin"
   } catch (error) {
     console.error("Error checking admin status:", error)
@@ -755,6 +774,174 @@ export async function deleteDepartment(id: string): Promise<{ success: boolean; 
     }
   } catch (error) {
     console.error("Error in deleteDepartment:", error)
+    return { success: false, message: "An unexpected error occurred" }
+  }
+}
+
+// Get all vacation types
+export async function getAllVacationTypes(): Promise<VacationType[]> {
+  try {
+    const supabase = getServerSupabase()
+
+    const { data, error } = await supabase
+      .from("vacation_types")
+      .select("*")
+      .order("id")
+
+    if (error) {
+      console.error("Error fetching vacation types:", error)
+      return []
+    }
+
+    return data || []
+  } catch (error) {
+    console.error("Error in getAllVacationTypes:", error)
+    return []
+  }
+}
+
+// Create a new vacation type
+export async function createVacationType(
+  name: string,
+  description: string | null,
+  color: string,
+  icon: string | null
+): Promise<{ success: boolean; message: string; vacationType?: VacationType }> {
+  try {
+    // Check if the current user is an admin
+    const isUserAdmin = await isAdmin()
+
+    if (!isUserAdmin) {
+      return { success: false, message: "You don't have permission to perform this action" }
+    }
+
+    const supabase = getServerSupabase()
+
+    // Create the vacation type
+    const { data, error } = await supabase
+      .from("vacation_types")
+      .insert({
+        name,
+        description,
+        color,
+        icon,
+      })
+      .select()
+      .single()
+
+    if (error) {
+      console.error("Error creating vacation type:", error)
+      return { success: false, message: "Failed to create vacation type" }
+    }
+
+    revalidatePath("/admin/vacation-types")
+
+    return {
+      success: true,
+      message: "Vacation type created successfully",
+      vacationType: data,
+    }
+  } catch (error) {
+    console.error("Error in createVacationType:", error)
+    return { success: false, message: "An unexpected error occurred" }
+  }
+}
+
+// Update a vacation type
+export async function updateVacationType(
+  id: number,
+  name: string,
+  description: string | null,
+  color: string,
+  icon: string | null
+): Promise<{ success: boolean; message: string }> {
+  try {
+    // Check if the current user is an admin
+    const isUserAdmin = await isAdmin()
+
+    if (!isUserAdmin) {
+      return { success: false, message: "You don't have permission to perform this action" }
+    }
+
+    const supabase = getServerSupabase()
+
+    // Update the vacation type
+    const { error } = await supabase
+      .from("vacation_types")
+      .update({
+        name,
+        description,
+        color,
+        icon,
+      })
+      .eq("id", id)
+
+    if (error) {
+      console.error("Error updating vacation type:", error)
+      return { success: false, message: "Failed to update vacation type" }
+    }
+
+    revalidatePath("/admin/vacation-types")
+
+    return {
+      success: true,
+      message: "Vacation type updated successfully",
+    }
+  } catch (error) {
+    console.error("Error in updateVacationType:", error)
+    return { success: false, message: "An unexpected error occurred" }
+  }
+}
+
+// Delete a vacation type
+export async function deleteVacationType(id: number): Promise<{ success: boolean; message: string }> {
+  try {
+    // Check if the current user is an admin
+    const isUserAdmin = await isAdmin()
+
+    if (!isUserAdmin) {
+      return { success: false, message: "You don't have permission to perform this action" }
+    }
+
+    const supabase = getServerSupabase()
+
+    // Check if there are vacations using this type
+    const { count, error: countError } = await supabase
+      .from("vacations")
+      .select("id", { count: "exact" })
+      .eq("vacation_type_id", id)
+
+    if (countError) {
+      console.error("Error checking vacations:", countError)
+      return { success: false, message: "Failed to check vacations" }
+    }
+
+    if (count && count > 0) {
+      return {
+        success: false,
+        message: "Cannot delete vacation type that is being used by vacations",
+      }
+    }
+
+    // Delete the vacation type
+    const { error } = await supabase
+      .from("vacation_types")
+      .delete()
+      .eq("id", id)
+
+    if (error) {
+      console.error("Error deleting vacation type:", error)
+      return { success: false, message: "Failed to delete vacation type" }
+    }
+
+    revalidatePath("/admin/vacation-types")
+
+    return {
+      success: true,
+      message: "Vacation type deleted successfully",
+    }
+  } catch (error) {
+    console.error("Error in deleteVacationType:", error)
     return { success: false, message: "An unexpected error occurred" }
   }
 }

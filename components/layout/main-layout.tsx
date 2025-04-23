@@ -4,7 +4,7 @@ import type React from "react"
 
 import { useState, useEffect } from "react"
 import Link from "next/link"
-import { usePathname, useRouter } from "next/navigation"
+import { usePathname } from "next/navigation"
 import { Calendar, Home, PieChart, PlusCircle, Settings, Menu, X, LogOut, User, ChevronUp } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
@@ -14,8 +14,7 @@ import { LanguageSwitcher } from "@/components/language-switcher"
 import { useLanguage } from "@/lib/i18n/client"
 import { useTranslations } from "@/hooks/use-translations"
 import { motion, AnimatePresence } from "framer-motion"
-import { signOut, getCurrentUser } from "@/lib/auth"
-import { useToast } from "@/hooks/use-toast"
+import { useAuth } from "@/hooks/use-auth"
 
 interface MainLayoutProps {
   children: React.ReactNode
@@ -23,27 +22,15 @@ interface MainLayoutProps {
 
 export function MainLayout({ children }: MainLayoutProps) {
   const pathname = usePathname()
-  const router = useRouter()
   const [isOpen, setIsOpen] = useState(false)
   const [showScrollTop, setShowScrollTop] = useState(false)
-  const [userName, setUserName] = useState<string>("")
   const { isRTL } = useLanguage()
   const { t } = useTranslations()
-  const { toast } = useToast()
+  const { user, signOut } = useAuth()
 
-  // Fetch user data
-  useEffect(() => {
-    async function fetchUser() {
-      const user = await getCurrentUser()
-      if (user?.user_metadata?.name) {
-        setUserName(user.user_metadata.name)
-      } else if (user?.email) {
-        setUserName(user.email.split("@")[0])
-      }
-    }
-
-    fetchUser()
-  }, [])
+  // Get user name from auth user
+  const userName = user?.user_metadata?.name ||
+                  (user?.email ? user.email.split("@")[0] : "User")
 
   // Check scroll position to show/hide scroll to top button
   useEffect(() => {
@@ -60,19 +47,7 @@ export function MainLayout({ children }: MainLayoutProps) {
   }
 
   const handleSignOut = async () => {
-    const { error } = await signOut()
-
-    if (error) {
-      toast({
-        title: "Error",
-        description: "Failed to sign out. Please try again.",
-        variant: "destructive",
-      })
-      return
-    }
-
-    router.push("/auth/login")
-    router.refresh()
+    await signOut()
   }
 
   const routes = [
@@ -108,7 +83,7 @@ export function MainLayout({ children }: MainLayoutProps) {
       {/* Mobile Header */}
       <header className="sticky top-0 z-50 flex h-16 items-center justify-between border-b bg-background px-4 md:hidden">
         <Link href="/" className="flex items-center gap-2">
-          <span className="font-bold text-xl text-primary">{t("app.name", "Jazati")}</span>
+          <span className="font-bold text-xl text-primary">{t("app.name", "AJazati")}</span>
         </Link>
 
         <div className="flex items-center gap-2">
@@ -126,7 +101,7 @@ export function MainLayout({ children }: MainLayoutProps) {
               <div className="flex flex-col h-full">
                 <div className="flex items-center justify-between border-b pb-4">
                   <Link href="/" onClick={() => setIsOpen(false)} className="flex items-center gap-2">
-                    <span className="font-bold text-xl text-primary">{t("app.name", "Jazati")}</span>
+                    <span className="font-bold text-xl text-primary">{t("app.name", "AJazati")}</span>
                   </Link>
                   <Button variant="ghost" size="icon" onClick={() => setIsOpen(false)}>
                     <X className="h-5 w-5" />
@@ -172,7 +147,7 @@ export function MainLayout({ children }: MainLayoutProps) {
         <aside className="hidden w-64 flex-col border-r bg-background md:flex">
           <div className="flex h-16 items-center border-b px-6">
             <Link href="/" className="flex items-center gap-2">
-              <span className="font-bold text-xl text-primary">{t("app.name", "Jazati")}</span>
+              <span className="font-bold text-xl text-primary">{t("app.name", "AJazati")}</span>
             </Link>
           </div>
           <nav className="flex-1 overflow-auto py-6 px-4">

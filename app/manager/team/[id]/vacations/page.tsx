@@ -1,12 +1,10 @@
 import Link from "next/link"
 import { notFound } from "next/navigation"
-import { cookies } from "next/headers"
-import { getServerUser } from "@/lib/server-auth"
+import { getServerUser, createServerClient } from "@/lib/server-auth"
 import { getTranslations, getLocale } from "@/lib/i18n/server"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { ArrowLeft, Calendar, Clock } from "lucide-react"
-import { createClient } from "@/lib/supabase"
 import { formatDate } from "@/lib/utils"
 import { Badge } from "@/components/ui/badge"
 import { getVacationTypeColor } from "@/lib/utils"
@@ -20,35 +18,35 @@ interface TeamMemberVacationsPageProps {
 export default async function TeamMemberVacationsPage({ params }: TeamMemberVacationsPageProps) {
   // الحصول على المستخدم الحالي
   const user = await getServerUser()
-  
+
   // الحصول على الترجمات
   const locale = await getLocale()
   const { t } = await getTranslations(locale)
-  
-  const cookieStore = cookies()
-  const supabase = createClient(cookieStore)
-  
+
+  // Usar el cliente del servidor
+  const supabase = await createServerClient()
+
   // التحقق من صلاحيات المستخدم
   if (!user || (user.role !== "manager" && user.role !== "admin")) {
     notFound()
   }
-  
+
   // الحصول على معلومات عضو الفريق
   const { data: teamMember, error: memberError } = await supabase
     .from("users")
     .select("*")
     .eq("id", params.id)
     .single()
-  
+
   if (memberError || !teamMember) {
     notFound()
   }
-  
+
   // التحقق من أن هذا العضو ينتمي إلى فريق المدير
   if (teamMember.manager_id !== user.id && user.role !== "admin") {
     notFound()
   }
-  
+
   // الحصول على إجازات عضو الفريق
   const { data: vacations, error: vacationsError } = await supabase
     .from("vacations")
@@ -62,7 +60,7 @@ export default async function TeamMemberVacationsPage({ params }: TeamMemberVaca
     `)
     .eq("user_id", params.id)
     .order("start_date", { ascending: false })
-  
+
   if (vacationsError) {
     console.error("Error fetching team member vacations:", vacationsError)
   }
@@ -96,7 +94,7 @@ export default async function TeamMemberVacationsPage({ params }: TeamMemberVaca
         <CardContent>
           {vacations && vacations.length > 0 ? (
             <div className="space-y-4">
-              {vacations.map((vacation) => (
+              {vacations.map((vacation: any) => (
                 <Card key={vacation.id} className="overflow-hidden">
                   <CardContent className="p-0">
                     <div className="p-4 border-b flex justify-between items-center">
