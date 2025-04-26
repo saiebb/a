@@ -84,6 +84,9 @@ export async function middleware(request: NextRequest) {
     // Define manager routes
     const isManagerRoute = pathname.startsWith("/manager")
 
+    // Define super admin routes
+    const isSuperAdminRoute = pathname.startsWith("/super-admin")
+
     // Check if onboarding has been completed
     const onboardingCompleted = request.cookies.get("onboardingCompleted")?.value === "true"
 
@@ -101,6 +104,40 @@ export async function middleware(request: NextRequest) {
     // If user is authenticated and trying to access auth routes
     if (session && isPublicRoute && !errorParam) {
       // Don't redirect if there's an error parameter
+      console.log("Middleware: User is authenticated and trying to access auth route, redirecting to home")
+
+      // Get the user's role to determine where to redirect them
+      try {
+        const { data: userData, error: userError } = await supabase
+          .from("users")
+          .select("role")
+          .eq("id", session.user.id)
+          .single()
+
+        // Special case for muhammadelshora@outlook.com
+        if (session.user.email === "muhammadelshora@outlook.com") {
+          console.log("Middleware: Special case for muhammadelshora@outlook.com, redirecting to super-admin")
+          return NextResponse.redirect(new URL("/super-admin", request.url))
+        }
+
+        if (!userError && userData) {
+          // Redirect based on role
+          switch (userData.role) {
+            case "super_admin":
+              return NextResponse.redirect(new URL("/super-admin", request.url))
+            case "admin":
+              return NextResponse.redirect(new URL("/admin", request.url))
+            case "manager":
+              return NextResponse.redirect(new URL("/manager", request.url))
+            default:
+              return NextResponse.redirect(new URL("/", request.url))
+          }
+        }
+      } catch (roleError) {
+        console.error("Error determining role for redirect:", roleError)
+      }
+
+      // Default redirect if role determination fails
       return NextResponse.redirect(new URL("/", request.url))
     }
 
@@ -136,6 +173,27 @@ export async function middleware(request: NextRequest) {
 
       if (userError || !userData || (userData.role !== "manager" && userData.role !== "admin" && userData.role !== "super_admin")) {
         console.log("Access denied to manager route for user:", session.user.id, "with role:", userData?.role)
+        return NextResponse.redirect(new URL("/", request.url))
+      }
+    }
+
+    // Check user role for super admin routes
+    if (session && isSuperAdminRoute) {
+      // Special case for muhammadelshora@outlook.com
+      if (session.user.email === "muhammadelshora@outlook.com") {
+        console.log("Middleware: Special case for muhammadelshora@outlook.com, allowing access to super-admin")
+        return response
+      }
+
+      // Get user role from database
+      const { data: userData, error: userError } = await supabase
+        .from("users")
+        .select("role")
+        .eq("id", session.user.id)
+        .single()
+
+      if (userError || !userData || userData.role !== "super_admin") {
+        console.log("Access denied to super admin route for user:", session.user.id, "with role:", userData?.role)
         return NextResponse.redirect(new URL("/", request.url))
       }
     }

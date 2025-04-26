@@ -58,10 +58,12 @@ export async function signInWithEmail(email: string, password: string) {
       }
     }
 
+    console.log("Attempting to sign in with Supabase auth...")
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
     })
+    console.log("Supabase auth sign in result:", error ? "Error" : "Success", data ? "Data available" : "No data")
 
     if (error) {
       // Log error for debugging but return a user-friendly message

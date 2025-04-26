@@ -12,6 +12,7 @@ export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
     persistSession: true,
     autoRefreshToken: true,
     detectSessionInUrl: true,
+    storageKey: 'supabase.auth.token',
   },
 })
 
@@ -19,12 +20,12 @@ export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
 export async function getCurrentUser() {
   try {
     const { data: { user }, error } = await supabase.auth.getUser()
-    
+
     if (error) {
       console.error('Error getting current user:', error)
       return null
     }
-    
+
     return user
   } catch (error) {
     console.error('Unexpected error getting current user:', error)
@@ -36,12 +37,12 @@ export async function getCurrentUser() {
 export async function getCurrentSession() {
   try {
     const { data: { session }, error } = await supabase.auth.getSession()
-    
+
     if (error) {
       console.error('Error getting current session:', error)
       return null
     }
-    
+
     return session
   } catch (error) {
     console.error('Unexpected error getting current session:', error)

@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { useRouter } from "next/navigation"
+// import { useRouter } from "next/navigation" - Not needed anymore as we use window.location
 import Link from "next/link"
 import { z } from "zod"
 import { useForm } from "react-hook-form"
@@ -37,7 +37,7 @@ interface LoginFormProps {
 }
 
 export function LoginForm({ error: initialError, redirectTo = "/" }: LoginFormProps) {
-  const router = useRouter()
+  // No router needed as we use window.location.href for redirects
   const { toast } = useToast()
   const [isLoading, setIsLoading] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
@@ -99,6 +99,24 @@ export function LoginForm({ error: initialError, redirectTo = "/" }: LoginFormPr
 
       // الحصول على معرف المستخدم من البيانات المُرجعة
       const userId = data?.user?.id
+      const userEmail = data?.user?.email
+
+      // حالة خاصة للمستخدم muhammadelshora@outlook.com
+      if (userEmail === "muhammadelshora@outlook.com") {
+        console.log("Special case detected in login form: muhammadelshora@outlook.com")
+        const specialPath = "/super-admin"
+        console.log("Special case redirect path:", specialPath)
+
+        // Add a longer delay to ensure session is properly set
+        console.log("Setting up special case redirect timeout...")
+        setTimeout(() => {
+          console.log("Now redirecting to special path:", specialPath)
+          // Force a complete page reload with no caching
+          window.location.href = specialPath
+          console.log("Special redirect command issued")
+        }, 500)
+        return
+      }
 
       if (userId) {
         console.log("Getting redirect path based on user role...")
@@ -109,20 +127,26 @@ export function LoginForm({ error: initialError, redirectTo = "/" }: LoginFormPr
         // Add a longer delay to ensure session is properly set
         // This helps prevent the issue with double login screens in Next.js 15
         console.log("Waiting for session to be properly set before redirecting...")
+
+        // Use window.location for a hard redirect instead of router.push
+        // This ensures a complete page reload and proper session handling
+        console.log("Setting up redirect timeout...")
         setTimeout(() => {
-          // Redirect to the role-specific path
           console.log("Now redirecting to:", rolePath)
-          router.push(rolePath)
-          router.refresh()
-        }, 1000)
+          // Force a complete page reload with no caching
+          window.location.href = rolePath
+          console.log("Redirect command issued")
+        }, 500)
       } else {
         // في حالة عدم وجود معرف للمستخدم، استخدم المسار الافتراضي
         console.log("No user ID found, using default redirect path")
+        console.log("Setting up default redirect timeout...")
         setTimeout(() => {
           console.log("Now redirecting to:", redirectTo)
-          router.push(redirectTo)
-          router.refresh()
-        }, 1000)
+          // Force a complete page reload with no caching
+          window.location.href = redirectTo
+          console.log("Default redirect command issued")
+        }, 500)
       }
     } catch (error) {
       console.error("Unexpected login error:", error)

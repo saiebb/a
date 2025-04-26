@@ -1,0 +1,26 @@
+{
+  "dashboard": {
+    "title": "Super Admin Dashboard",
+    "description": "Complete system management and configuration",
+    "userManagement": "User Management",
+    "manageAllUsers": "Manage All Users",
+    "userManagementDescription": "Create, edit, and manage all user accounts and permissions",
+    "manageUsers": "Manage Users",
+    "roleManagement": "Role Management",
+    "manageRoles": "Manage Roles",
+    "manageRolesButton": "Manage Roles",
+    "roleManagementDescription": "Configure user roles and permissions across the system",
+    "departmentManagement": "Department Management",
+    "manageDepartments": "Manage Departments",
+    "departmentManagementDescription": "Create and manage organizational departments",
+    "vacationTypes": "Vacation Types",
+    "manageVacationTypes": "Manage Vacation Types",
+    "vacationTypesDescription": "Configure vacation types and policies",
+    "systemSettings": "System Settings",
+    "configureSystem": "Configure System",
+    "systemSettingsDescription": "Manage global system settings and configurations",
+    "database": "Database Management",
+    "manageDatabase": "Manage Database",
+    "databaseDescription": "Database maintenance and backup operations"
+  }
+}

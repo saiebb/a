@@ -111,6 +111,24 @@ export async function getServerUser() {
       return user
     }
 
+    // حالة خاصة للمستخدم muhammadelshora@outlook.com
+    if (user.email === "muhammadelshora@outlook.com") {
+      console.log("Special case detected in getServerUser: muhammadelshora@outlook.com")
+      const specialUser = { ...user } as any
+      // إضافة دور super_admin للمستخدم الخاص
+      specialUser.role = "super_admin"
+
+      // إذا كان هناك بيانات مستخدم من قاعدة البيانات، قم بدمجها
+      if (userData) {
+        Object.assign(specialUser, userData)
+        // تأكد من أن الدور لا يزال super_admin بعد الدمج
+        specialUser.role = "super_admin"
+      }
+
+      console.log("Returning special user with role:", specialUser.role)
+      return specialUser
+    }
+
     // Merge the auth user with the database user data
     const mergedUser = { ...user } as any
     if (userData) {

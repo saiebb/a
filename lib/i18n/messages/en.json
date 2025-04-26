@@ -325,10 +325,36 @@
       "noVacations": "This team member hasn't requested any vacations yet"
     }
   },
+  "superAdmin": {
+    "dashboard": {
+      "title": "Super Admin Dashboard",
+      "description": "Complete system management and configuration",
+      "userManagement": "User Management",
+      "manageAllUsers": "Manage All Users",
+      "userManagementDescription": "Create, edit, and manage all user accounts and permissions",
+      "manageUsers": "Manage Users",
+      "roleManagement": "Role Management",
+      "manageRoles": "Manage Roles",
+      "manageRolesButton": "Manage Roles",
+      "roleManagementDescription": "Configure user roles and permissions across the system",
+      "departmentManagement": "Department Management",
+      "manageDepartments": "Manage Departments",
+      "departmentManagementDescription": "Create and manage organizational departments",
+      "vacationTypes": "Vacation Types",
+      "manageVacationTypes": "Manage Vacation Types",
+      "vacationTypesDescription": "Configure vacation types and policies",
+      "systemSettings": "System Settings",
+      "configureSystem": "Configure System",
+      "systemSettingsDescription": "Manage global system settings and configurations",
+      "database": "Database Management",
+      "manageDatabase": "Manage Database",
+      "databaseDescription": "Database maintenance and backup operations"
+    }
+  },
   "admin": {
     "vacationTypes": {
       "title": "Vacation Types",
-      "description": "Manage and customize vacation types",
+      "sectionDescription": "Manage and customize vacation types",
       "createType": "Create Vacation Type",
       "createTypeDescription": "Create a new vacation type in the system",
       "editType": "Edit Vacation Type",
@@ -340,7 +366,7 @@
       "typesListDescription": "All vacation types available in the system",
       "noTypes": "No vacation types yet",
       "name": "Name",
-      "description": "Description",
+      "descriptionField": "Description",
       "color": "Color",
       "icon": "Icon",
       "namePlaceholder": "Enter vacation type name",
@@ -415,13 +441,13 @@
     },
     "departments": {
       "title": "Department Management",
-      "description": "Create and edit departments and assign users",
+      "sectionDescription": "Create and edit departments and assign users",
       "createDepartment": "Create Department",
       "departmentsList": "Departments List",
       "departmentsListDescription": "All departments in the system",
       "noDepartments": "No departments yet",
       "name": "Name",
-      "description": "Description",
+      "descriptionField": "Description",
       "manager": "Manager",
       "noManager": "No Manager",
       "createdAt": "Created At",

@@ -11,17 +11,16 @@ export const metadata: Metadata = {
 }
 
 // استخدام نمط الوسيط لتجنب مشاكل searchParams في Next.js 15
-export default async function LoginPage(props: any) {
+export default async function LoginPage({ searchParams }: { searchParams: { [key: string]: string | string[] | undefined } }) {
   // Get translations
   const locale = await getLocale()
   const { t } = await getTranslations(locale)
 
   // تعريف قيم افتراضية
-  let error: string | null = null
-  let redirectTo: string = "/"
+  let error: string | null = searchParams.error ? String(searchParams.error) : null
+  let redirectTo: string = searchParams.redirect ? String(searchParams.redirect) : "/"
 
   try {
-
     // Create a server-side Supabase client
     const supabase = await createServerClient()
 
