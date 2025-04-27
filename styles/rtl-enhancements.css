@@ -1,0 +1,133 @@
+/* Mejoras específicas para RTL */
+
+/* Alineación correcta para componentes de interfaz */
+[dir="rtl"] .flex-row {
+  flex-direction: row-reverse;
+}
+
+[dir="rtl"] .space-x-2 > :not([hidden]) ~ :not([hidden]) {
+  --tw-space-x-reverse: 1;
+}
+
+[dir="rtl"] .space-x-4 > :not([hidden]) ~ :not([hidden]) {
+  --tw-space-x-reverse: 1;
+}
+
+/* Ajustes para iconos en botones */
+[dir="rtl"] .button-icon-start {
+  margin-right: 0;
+  margin-left: 0.5rem;
+}
+
+[dir="rtl"] .button-icon-end {
+  margin-left: 0;
+  margin-right: 0.5rem;
+}
+
+/* Ajustes para menús desplegables */
+[dir="rtl"] .dropdown-content {
+  left: auto;
+  right: 0;
+}
+
+/* Ajustes para campos de entrada */
+[dir="rtl"] input[type="text"],
+[dir="rtl"] input[type="email"],
+[dir="rtl"] input[type="number"],
+[dir="rtl"] textarea {
+  text-align: right;
+}
+
+/* Ajustes para tablas */
+[dir="rtl"] th,
+[dir="rtl"] td {
+  text-align: right;
+}
+
+/* Ajustes para tarjetas y contenedores */
+[dir="rtl"] .card-header {
+  text-align: right;
+}
+
+/* Ajustes para barras de progreso */
+[dir="rtl"] .progress-bar {
+  transform: scaleX(-1);
+}
+
+/* Ajustes para menús laterales */
+[dir="rtl"] .sidebar {
+  right: 0;
+  left: auto;
+}
+
+/* Ajustes para notificaciones */
+[dir="rtl"] .notification-content {
+  text-align: right;
+}
+
+/* Ajustes para modales */
+[dir="rtl"] .modal-header {
+  text-align: right;
+}
+
+/* Ajustes para tooltips */
+[dir="rtl"] .tooltip {
+  text-align: right;
+}
+
+/* Ajustes para formularios */
+[dir="rtl"] .form-label {
+  text-align: right;
+}
+
+/* Ajustes para botones de acción */
+[dir="rtl"] .action-buttons {
+  flex-direction: row-reverse;
+}
+
+/* Ajustes para pestañas */
+[dir="rtl"] .tabs-list {
+  flex-direction: row-reverse;
+}
+
+/* Ajustes para breadcrumbs */
+[dir="rtl"] .breadcrumb-item {
+  flex-direction: row-reverse;
+}
+
+/* Ajustes para paginación */
+[dir="rtl"] .pagination {
+  flex-direction: row-reverse;
+}
+
+/* Ajustes para acordeones */
+[dir="rtl"] .accordion-header {
+  text-align: right;
+}
+
+/* Ajustes para selectores */
+[dir="rtl"] .select-trigger {
+  text-align: right;
+}
+
+/* Ajustes para checkboxes y radios */
+[dir="rtl"] .checkbox-label,
+[dir="rtl"] .radio-label {
+  padding-right: 1.5rem;
+  padding-left: 0;
+}
+
+/* Ajustes para gráficos */
+[dir="rtl"] .chart-container {
+  direction: ltr; /* Los gráficos generalmente se mantienen en LTR */
+}
+
+/* Ajustes para tooltips de gráficos */
+[dir="rtl"] .recharts-tooltip-wrapper {
+  direction: rtl;
+}
+
+/* Mejoras de animación para transiciones RTL/LTR */
+.rtl-ltr-transition {
+  transition: all 0.3s ease;
+}

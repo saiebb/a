@@ -10,7 +10,7 @@ import type { Department } from "@/types/department"
  */
 export async function getAllDepartments(): Promise<Department[]> {
   try {
-    const cookieStore = cookies()
+    const cookieStore = await cookies()
     const supabase = createClient(cookieStore)
 
     const { data: departments, error } = await supabase
@@ -41,9 +41,9 @@ export async function getAllDepartments(): Promise<Department[]> {
 /**
  * الحصول على قسم بواسطة المعرف
  */
-export async function getDepartmentById(id: number): Promise<Department | null> {
+export async function getDepartmentById(id: string): Promise<Department | null> {
   try {
-    const cookieStore = cookies()
+    const cookieStore = await cookies()
     const supabase = createClient(cookieStore)
 
     const { data: department, error } = await supabase
@@ -77,12 +77,12 @@ export async function getDepartmentById(id: number): Promise<Department | null> 
  */
 export async function createDepartment(data: { name: string; description?: string; manager_id?: string }): Promise<{ success: boolean; message: string; department?: Department }> {
   try {
-    const cookieStore = cookies()
+    const cookieStore = await cookies()
     const supabase = createClient(cookieStore)
 
     // التحقق من صلاحيات المستخدم
     const { data: { user } } = await supabase.auth.getUser()
-    
+
     if (!user) {
       return { success: false, message: "User not authenticated" }
     }
@@ -127,14 +127,14 @@ export async function createDepartment(data: { name: string; description?: strin
 /**
  * تحديث قسم
  */
-export async function updateDepartment(id: number, data: { name?: string; description?: string; manager_id?: string | null }): Promise<{ success: boolean; message: string }> {
+export async function updateDepartment(id: string, data: { name?: string; description?: string; manager_id?: string | null }): Promise<{ success: boolean; message: string }> {
   try {
-    const cookieStore = cookies()
+    const cookieStore = await cookies()
     const supabase = createClient(cookieStore)
 
     // التحقق من صلاحيات المستخدم
     const { data: { user } } = await supabase.auth.getUser()
-    
+
     if (!user) {
       return { success: false, message: "User not authenticated" }
     }
@@ -177,14 +177,14 @@ export async function updateDepartment(id: number, data: { name?: string; descri
 /**
  * حذف قسم
  */
-export async function deleteDepartment(id: number): Promise<{ success: boolean; message: string }> {
+export async function deleteDepartment(id: string): Promise<{ success: boolean; message: string }> {
   try {
-    const cookieStore = cookies()
+    const cookieStore = await cookies()
     const supabase = createClient(cookieStore)
 
     // التحقق من صلاحيات المستخدم
     const { data: { user } } = await supabase.auth.getUser()
-    
+
     if (!user) {
       return { success: false, message: "User not authenticated" }
     }
@@ -203,7 +203,7 @@ export async function deleteDepartment(id: number): Promise<{ success: boolean; 
     // التحقق من وجود مستخدمين في هذا القسم
     const { count, error: countError } = await supabase
       .from("users")
-      .select("id", { count: true })
+      .select("id", { count: "exact" })
       .eq("department_id", id)
 
     if (countError) {
@@ -239,7 +239,7 @@ export async function deleteDepartment(id: number): Promise<{ success: boolean; 
  */
 export async function getEligibleDepartmentManagers(): Promise<{ id: string; name: string; email: string; role: string }[]> {
   try {
-    const cookieStore = cookies()
+    const cookieStore = await cookies()
     const supabase = createClient(cookieStore)
 
     const { data: managers, error } = await supabase
@@ -263,9 +263,9 @@ export async function getEligibleDepartmentManagers(): Promise<{ id: string; nam
 /**
  * الحصول على المستخدمين في قسم معين
  */
-export async function getUsersByDepartment(departmentId: number): Promise<{ id: string; name: string; email: string; role: string }[]> {
+export async function getUsersByDepartment(departmentId: string): Promise<{ id: string; name: string; email: string; role: string }[]> {
   try {
-    const cookieStore = cookies()
+    const cookieStore = await cookies()
     const supabase = createClient(cookieStore)
 
     const { data: users, error } = await supabase
@@ -289,14 +289,14 @@ export async function getUsersByDepartment(departmentId: number): Promise<{ id: 
 /**
  * تعيين قسم للمستخدم
  */
-export async function assignUserToDepartment(userId: string, departmentId: number | null): Promise<{ success: boolean; message: string }> {
+export async function assignUserToDepartment(userId: string, departmentId: string | null): Promise<{ success: boolean; message: string }> {
   try {
-    const cookieStore = cookies()
+    const cookieStore = await cookies()
     const supabase = createClient(cookieStore)
 
     // التحقق من صلاحيات المستخدم
     const { data: { user } } = await supabase.auth.getUser()
-    
+
     if (!user) {
       return { success: false, message: "User not authenticated" }
     }

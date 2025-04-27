@@ -92,3 +92,6 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+/* Importar mejoras RTL */
+@import url('../styles/rtl-enhancements.css');

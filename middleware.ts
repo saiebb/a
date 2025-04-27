@@ -105,39 +105,6 @@ export async function middleware(request: NextRequest) {
     if (session && isPublicRoute && !errorParam) {
       // Don't redirect if there's an error parameter
       console.log("Middleware: User is authenticated and trying to access auth route, redirecting to home")
-
-      // Get the user's role to determine where to redirect them
-      try {
-        const { data: userData, error: userError } = await supabase
-          .from("users")
-          .select("role")
-          .eq("id", session.user.id)
-          .single()
-
-        // Special case for muhammadelshora@outlook.com
-        if (session.user.email === "muhammadelshora@outlook.com") {
-          console.log("Middleware: Special case for muhammadelshora@outlook.com, redirecting to super-admin")
-          return NextResponse.redirect(new URL("/super-admin", request.url))
-        }
-
-        if (!userError && userData) {
-          // Redirect based on role
-          switch (userData.role) {
-            case "super_admin":
-              return NextResponse.redirect(new URL("/super-admin", request.url))
-            case "admin":
-              return NextResponse.redirect(new URL("/admin", request.url))
-            case "manager":
-              return NextResponse.redirect(new URL("/manager", request.url))
-            default:
-              return NextResponse.redirect(new URL("/", request.url))
-          }
-        }
-      } catch (roleError) {
-        console.error("Error determining role for redirect:", roleError)
-      }
-
-      // Default redirect if role determination fails
       return NextResponse.redirect(new URL("/", request.url))
     }
 

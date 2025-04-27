@@ -3,7 +3,12 @@
 import { MainLayout } from "@/components/layout/main-layout"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { PieChart, BarChart, LineChart } from "lucide-react"
+import { PieChart as PieChartIcon, BarChart as BarChartIcon, LineChart as LineChartIcon, Lightbulb } from "lucide-react"
+import { EnhancedPieChart } from "@/components/charts/enhanced-pie-chart"
+import { EnhancedBarChart } from "@/components/charts/enhanced-bar-chart"
+import { EnhancedLineChart } from "@/components/charts/enhanced-line-chart"
+import { useTranslations } from "@/hooks/use-translations"
+import { useLanguage } from "@/lib/i18n/client"
 
 // This would normally come from an API
 const mockData = {
@@ -27,6 +32,32 @@ const mockData = {
     { name: "Nov", value: 0 },
     { name: "Dec", value: 0 },
   ],
+  trends: [
+    {
+      name: "Vacation Days",
+      data: [
+        { name: "2023-Q1", value: 5 },
+        { name: "2023-Q2", value: 7 },
+        { name: "2023-Q3", value: 10 },
+        { name: "2023-Q4", value: 8 },
+        { name: "2024-Q1", value: 6 },
+        { name: "2024-Q2", value: 9 }
+      ],
+      color: "#4CAF50"
+    },
+    {
+      name: "Sick Days",
+      data: [
+        { name: "2023-Q1", value: 2 },
+        { name: "2023-Q2", value: 1 },
+        { name: "2023-Q3", value: 0 },
+        { name: "2023-Q4", value: 3 },
+        { name: "2024-Q1", value: 2 },
+        { name: "2024-Q2", value: 1 }
+      ],
+      color: "#FF8A65"
+    }
+  ],
   insights: [
     "You've used 48% of your annual vacation allowance.",
     "August was your most active vacation month.",
@@ -37,24 +68,106 @@ const mockData = {
 }
 
 export default function InsightsPage() {
+  const { t } = useTranslations()
+  const { locale, isRTL } = useLanguage()
+
+  // Traducir los nombres de los meses si es necesario
+  const monthNames = {
+    en: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+    ar: ["يناير", "فبراير", "مارس", "أبريل", "مايو", "يونيو", "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"]
+  }
+
+  // Traducir los tipos de vacaciones
+  const vacationTypeNames = {
+    en: {
+      "Regular": "Regular",
+      "Casual": "Casual",
+      "Sick": "Sick",
+      "Personal": "Personal"
+    },
+    ar: {
+      "Regular": "عادية",
+      "Casual": "عارضة",
+      "Sick": "مرضية",
+      "Personal": "شخصية"
+    }
+  }
+
+  // Traducir los trimestres
+  const quarterNames = {
+    en: {
+      "2023-Q1": "2023-Q1",
+      "2023-Q2": "2023-Q2",
+      "2023-Q3": "2023-Q3",
+      "2023-Q4": "2023-Q4",
+      "2024-Q1": "2024-Q1",
+      "2024-Q2": "2024-Q2"
+    },
+    ar: {
+      "2023-Q1": "2023-ر1",
+      "2023-Q2": "2023-ر2",
+      "2023-Q3": "2023-ر3",
+      "2023-Q4": "2023-ر4",
+      "2024-Q1": "2024-ر1",
+      "2024-Q2": "2024-ر2"
+    }
+  }
+
+  // Traducir los nombres de las series
+  const seriesNames = {
+    en: {
+      "Vacation Days": "Vacation Days",
+      "Sick Days": "Sick Days"
+    },
+    ar: {
+      "Vacation Days": "أيام الإجازة",
+      "Sick Days": "أيام المرض"
+    }
+  }
+
+  // Formatear los datos para los gráficos
+  const formattedByMonth = mockData.byMonth.map((item, index) => ({
+    ...item,
+    name: monthNames[locale as keyof typeof monthNames][index]
+  }))
+
+  const formattedByType = mockData.byType.map(item => ({
+    ...item,
+    name: vacationTypeNames[locale as keyof typeof vacationTypeNames][item.name as keyof typeof vacationTypeNames[typeof locale]]
+  }))
+
+  const formattedTrends = mockData.trends.map(series => ({
+    ...series,
+    name: seriesNames[locale as keyof typeof seriesNames][series.name as keyof typeof seriesNames[typeof locale]],
+    data: series.data.map(item => ({
+      ...item,
+      name: quarterNames[locale as keyof typeof quarterNames][item.name as keyof typeof quarterNames[typeof locale]]
+    }))
+  }))
+
+  // Formatear valores para los gráficos
+  const formatDays = (value: number) => {
+    return `${value} ${value === 1 ? t("common.day", "day") : t("common.days", "days")}`
+  }
+
   return (
     <MainLayout>
       <div className="container py-6 space-y-6">
-        <h1 className="text-2xl font-bold">Vacation Insights</h1>
+        <h1 className="text-2xl font-bold">{t("insights.title", "Vacation Insights")}</h1>
 
         <Tabs defaultValue="overview">
           <TabsList>
             <TabsTrigger value="overview">
-              <PieChart className="h-4 w-4 mr-2" />
-              Overview
+              <PieChartIcon className="h-4 w-4 mr-2" />
+              {t("insights.overview", "Overview")}
             </TabsTrigger>
             <TabsTrigger value="monthly">
-              <BarChart className="h-4 w-4 mr-2" />
-              Monthly
+              <BarChartIcon className="h-4 w-4 mr-2" />
+              {t("insights.monthly", "Monthly")}
             </TabsTrigger>
             <TabsTrigger value="trends">
-              <LineChart className="h-4 w-4 mr-2" />
-              Trends
+              <LineChartIcon className="h-4 w-4 mr-2" />
+              {t("insights.trends", "Trends")}
             </TabsTrigger>
           </TabsList>
 
@@ -62,53 +175,32 @@ export default function InsightsPage() {
             <div className="grid gap-6 md:grid-cols-2">
               <Card>
                 <CardHeader>
-                  <CardTitle>Vacation by Type</CardTitle>
-                  <CardDescription>Distribution of your vacation days by type</CardDescription>
+                  <CardTitle>{t("insights.vacationByType", "Vacation by Type")}</CardTitle>
+                  <CardDescription>{t("insights.vacationByTypeDescription", "Distribution of your vacation days by type")}</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="h-80 flex items-center justify-center">
-                    <div className="w-full max-w-md">
-                      <div className="flex flex-col space-y-4">
-                        {mockData.byType.map((item) => (
-                          <div key={item.name} className="flex items-center">
-                            <div className="w-4 h-4 rounded-full mr-2" style={{ backgroundColor: item.color }} />
-                            <div className="flex-1">{item.name}</div>
-                            <div className="font-medium">{item.value} days</div>
-                            <div className="w-full max-w-24 h-2 ml-2 bg-muted rounded-full overflow-hidden">
-                              <div
-                                className="h-full rounded-full"
-                                style={{
-                                  width: `${(item.value / 20) * 100}%`,
-                                  backgroundColor: item.color,
-                                }}
-                              />
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
+                  <EnhancedPieChart
+                    data={formattedByType}
+                    height={300}
+                    innerRadius={60}
+                    outerRadius={100}
+                    valueFormatter={formatDays}
+                    showLabels={true}
+                  />
                 </CardContent>
               </Card>
 
               <Card>
                 <CardHeader>
-                  <CardTitle>Smart Insights</CardTitle>
-                  <CardDescription>Personalized insights based on your vacation patterns</CardDescription>
+                  <CardTitle>{t("insights.smartInsights", "Smart Insights")}</CardTitle>
+                  <CardDescription>{t("insights.smartInsightsDescription", "Personalized insights based on your vacation patterns")}</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <ul className="space-y-4">
                     {mockData.insights.map((insight, index) => (
                       <li key={index} className="flex items-start">
                         <div className="bg-primary/20 text-primary rounded-full p-1 mr-3 mt-0.5">
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            viewBox="0 0 20 20"
-                            fill="currentColor"
-                            className="w-4 h-4"
-                          >
-                            <path d="M10.75 4.75a.75.75 0 00-1.5 0v4.5h-4.5a.75.75 0 000 1.5h4.5v4.5a.75.75 0 001.5 0v-4.5h4.5a.75.75 0 000-1.5h-4.5v-4.5z" />
-                          </svg>
+                          <Lightbulb className="w-4 h-4" />
                         </div>
                         <span>{insight}</span>
                       </li>
@@ -122,26 +214,17 @@ export default function InsightsPage() {
           <TabsContent value="monthly" className="mt-6">
             <Card>
               <CardHeader>
-                <CardTitle>Monthly Distribution</CardTitle>
-                <CardDescription>Your vacation days usage by month</CardDescription>
+                <CardTitle>{t("insights.monthlyDistribution", "Monthly Distribution")}</CardTitle>
+                <CardDescription>{t("insights.monthlyDistributionDescription", "Your vacation days usage by month")}</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="h-80">
-                  <div className="flex h-full items-end gap-2">
-                    {mockData.byMonth.map((month) => (
-                      <div key={month.name} className="flex-1 flex flex-col items-center gap-2">
-                        <div
-                          className="w-full bg-primary rounded-t-md transition-all duration-500"
-                          style={{
-                            height: `${(month.value / 5) * 100}%`,
-                            minHeight: month.value ? "8px" : "0",
-                          }}
-                        />
-                        <span className="text-xs font-medium">{month.name}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
+                <EnhancedBarChart
+                  data={formattedByMonth}
+                  height={300}
+                  valueFormatter={formatDays}
+                  xAxisLabel={t("common.months", "Months")}
+                  yAxisLabel={t("common.days", "Days")}
+                />
               </CardContent>
             </Card>
           </TabsContent>
@@ -149,13 +232,19 @@ export default function InsightsPage() {
           <TabsContent value="trends" className="mt-6">
             <Card>
               <CardHeader>
-                <CardTitle>Vacation Trends</CardTitle>
-                <CardDescription>Analysis of your vacation patterns over time</CardDescription>
+                <CardTitle>{t("insights.vacationTrends", "Vacation Trends")}</CardTitle>
+                <CardDescription>{t("insights.vacationTrendsDescription", "Analysis of your vacation patterns over time")}</CardDescription>
               </CardHeader>
-              <CardContent className="h-80 flex items-center justify-center">
-                <p className="text-muted-foreground">
-                  More detailed trend analysis will be available after you've used the app for a longer period.
-                </p>
+              <CardContent>
+                <EnhancedLineChart
+                  series={formattedTrends}
+                  height={300}
+                  valueFormatter={formatDays}
+                  xAxisLabel={t("common.quarters", "Quarters")}
+                  yAxisLabel={t("common.days", "Days")}
+                  curved={true}
+                  showDots={true}
+                />
               </CardContent>
             </Card>
           </TabsContent>

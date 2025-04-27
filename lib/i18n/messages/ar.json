@@ -328,7 +328,7 @@
   "admin": {
     "vacationTypes": {
       "title": "أنواع الإجازات",
-      "sectionDescription": "إدارة أنواع الإجازات وتخصيصها",
+      "description": "إدارة أنواع الإجازات وتخصيصها",
       "createType": "إنشاء نوع إجازة",
       "createTypeDescription": "إنشاء نوع إجازة جديد في النظام",
       "editType": "تعديل نوع الإجازة",
@@ -340,7 +340,7 @@
       "typesListDescription": "جميع أنواع الإجازات المتاحة في النظام",
       "noTypes": "لا توجد أنواع إجازات حتى الآن",
       "name": "الاسم",
-      "descriptionField": "الوصف",
+      "description": "الوصف",
       "color": "اللون",
       "icon": "الأيقونة",
       "namePlaceholder": "أدخل اسم نوع الإجازة",
@@ -415,13 +415,13 @@
     },
     "departments": {
       "title": "إدارة الأقسام",
-      "sectionDescription": "إنشاء وتعديل الأقسام وتعيين المستخدمين",
+      "description": "إنشاء وتعديل الأقسام وتعيين المستخدمين",
       "createDepartment": "إنشاء قسم",
       "departmentsList": "قائمة الأقسام",
       "departmentsListDescription": "جميع الأقسام في النظام",
       "noDepartments": "لا توجد أقسام حتى الآن",
       "name": "الاسم",
-      "descriptionField": "الوصف",
+      "description": "الوصف",
       "manager": "المدير",
       "noManager": "لا يوجد مدير",
       "createdAt": "تاريخ الإنشاء",

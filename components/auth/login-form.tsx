@@ -112,9 +112,9 @@ export function LoginForm({ error: initialError, redirectTo = "/" }: LoginFormPr
         setTimeout(() => {
           console.log("Now redirecting to special path:", specialPath)
           // Force a complete page reload with no caching
-          window.location.href = specialPath
+          window.location.replace(specialPath)
           console.log("Special redirect command issued")
-        }, 500)
+        }, 2000)
         return
       }
 
@@ -134,9 +134,9 @@ export function LoginForm({ error: initialError, redirectTo = "/" }: LoginFormPr
         setTimeout(() => {
           console.log("Now redirecting to:", rolePath)
           // Force a complete page reload with no caching
-          window.location.href = rolePath
+          window.location.replace(rolePath)
           console.log("Redirect command issued")
-        }, 500)
+        }, 2000)
       } else {
         // في حالة عدم وجود معرف للمستخدم، استخدم المسار الافتراضي
         console.log("No user ID found, using default redirect path")
@@ -144,9 +144,9 @@ export function LoginForm({ error: initialError, redirectTo = "/" }: LoginFormPr
         setTimeout(() => {
           console.log("Now redirecting to:", redirectTo)
           // Force a complete page reload with no caching
-          window.location.href = redirectTo
+          window.location.replace(redirectTo)
           console.log("Default redirect command issued")
-        }, 500)
+        }, 2000)
       }
     } catch (error) {
       console.error("Unexpected login error:", error)

@@ -354,7 +354,7 @@
   "admin": {
     "vacationTypes": {
       "title": "Vacation Types",
-      "sectionDescription": "Manage and customize vacation types",
+      "description": "Manage and customize vacation types",
       "createType": "Create Vacation Type",
       "createTypeDescription": "Create a new vacation type in the system",
       "editType": "Edit Vacation Type",
@@ -366,7 +366,7 @@
       "typesListDescription": "All vacation types available in the system",
       "noTypes": "No vacation types yet",
       "name": "Name",
-      "descriptionField": "Description",
+      "description": "Description",
       "color": "Color",
       "icon": "Icon",
       "namePlaceholder": "Enter vacation type name",
@@ -441,13 +441,13 @@
     },
     "departments": {
       "title": "Department Management",
-      "sectionDescription": "Create and edit departments and assign users",
+      "description": "Create and edit departments and assign users",
       "createDepartment": "Create Department",
       "departmentsList": "Departments List",
       "departmentsListDescription": "All departments in the system",
       "noDepartments": "No departments yet",
       "name": "Name",
-      "descriptionField": "Description",
+      "description": "Description",
       "manager": "Manager",
       "noManager": "No Manager",
       "createdAt": "Created At",
